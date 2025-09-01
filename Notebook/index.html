@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vincent E Neu - Hệ thống Tổng hợp Đề thi & Đáp án</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="gemini-api.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --border-color: #dadce0;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo::after {
+            content: "Liên hệ Admin";
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .logo:hover::after {
+            opacity: 1;
+        }
+
+        /* Logo nhấp nháy ở góc phải */
+        .floating-logo {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 9999;
+            animation: pulse 1.5s infinite;
+            transition: transform 0.3s ease;
+            border: 3px solid #fff;
+        }
+
+        .floating-logo:hover {
+            transform: scale(1.1);
+            animation: none;
+        }
+
+        .floating-logo img {
+            width: 80%;
+            height: 80%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        /* Nút liên hệ ở góc phải dưới */
+        .contact-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #34a853, #4285f4);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            z-index: 9999;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+        }
+
+        .contact-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #2d8f47, #3b78e7);
+        }
+
+        .contact-button i {
+            font-size: 16px;
+        }
+
+        /* Modal API Key */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .api-input-group {
+            margin-bottom: 20px;
+        }
+
+        .api-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .api-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .api-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .api-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3367d6;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #e8eaed;
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 12px;
+        }
+
+        .api-status.connected {
+            background: rgba(52, 168, 83, 0.1);
+            color: var(--secondary-color);
+            border: 1px solid rgba(52, 168, 83, 0.2);
+        }
+
+        .api-status.disconnected {
+            background: rgba(234, 67, 53, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(234, 67, 53, 0.2);
+        }
+
+        .brand-info h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .brand-info p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(52, 168, 83, 0.1);
+            border: 1px solid rgba(52, 168, 83, 0.2);
+            border-radius: 20px;
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Container */
+        .main-container {
+            margin-top: 90px;
+            height: calc(100vh - 90px);
+            display: flex;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .document-list {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .document-item {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .document-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .document-item.active {
+            border-color: var(--primary-color);
+            background: rgba(66, 133, 244, 0.05);
+        }
+
+        .document-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 0.75rem;
+        }
+
+        .document-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .document-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+        }
+
+        .chat-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .chat-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .chat-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: var(--bg-secondary);
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+            margin-bottom: 2rem;
+            justify-content: flex-end;
+        }
+
+        .message.ai {
+            margin-bottom: 2rem;
+            justify-content: flex-start;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .message-avatar::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            border: 2px solid #4285f4;
+        }
+
+        .message.ai .message-avatar {
+            background: linear-gradient(135deg, #ea4335, #fbbc04);
+            color: white;
+            border: 2px solid #ea4335;
+        }
+
+        .message-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-width: 70%;
+            line-height: 1.6;
+            border-left: 4px solid #dadce0;
+            width: fit-content;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            border-left: 4px solid #4285f4;
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        .message.ai .message-content {
+            background: #f8f9fa;
+            color: var(--text-primary);
+            border-left: 4px solid #ea4335;
+            margin-right: auto;
+            margin-left: 0;
+        }
+
+        .chat-input {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background: white;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .input-field {
+            flex: 1;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: none;
+            min-height: 60px;
+            max-height: 120px;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(66, 133, 244, 0.3);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: loading 1.4s infinite ease-in-out;
+        }
+
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes loading {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .main-container {
+                margin: 80px 1rem 1rem 1rem;
+                border-radius: 12px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+        }
+
+        /* Hide sidebar for users - only show chat area */
+        .sidebar {
+            display: none;
+        }
+
+        .main-container {
+            margin-top: 90px;
+            height: calc(100vh - 90px);
+            display: flex;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+            width: 100%;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Nút liên hệ ở góc phải dưới -->
+    <div class="contact-button" onclick="window.open('https://zalo.me/84943222362', '_blank')" title="Liên hệ Admin qua Zalo">
+        <i class="fas fa-headset"></i>
+        <span>Liên Hệ</span>
+    </div>
+
+
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                                 <div class="logo" onclick="window.open('https://zalo.me/84943222362', '_blank')" style="cursor: pointer;">
+                     <img src="z6931423474483_5a32b03c376620b1a7e8e5b47f902cec.jpg" alt="Vincent E Neu - Hệ thống Đề thi" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                 </div>
+                                 <div class="brand-info">
+                     <h1>Vincent E Neu</h1>
+                     <p>Hệ thống Tổng hợp Đề thi & Đáp án</p>
+                 </div>
+            </div>
+                         <div class="ai-status">
+                 <div class="status-dot"></div>
+                 <span>Hệ thống Đề thi Online</span>
+             </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                                 <h3 class="sidebar-title">
+                     <i class="fas fa-file-alt"></i>
+                     Bộ đề thi có sẵn
+                 </h3>
+                 <p class="sidebar-subtitle">Chọn bộ đề để tra cứu</p>
+            </div>
+            
+            <div class="document-list">
+                                 <div class="document-item active" data-doc="toanHoc">
+                     <div class="document-icon">
+                         <i class="fas fa-calculator"></i>
+                     </div>
+                     <div class="document-name">Toán cao cấp</div>
+                     <div class="document-info">
+                         <i class="fas fa-clock"></i>
+                         Cập nhật: 2 ngày trước
+                     </div>
+                 </div>
+
+                 <div class="document-item" data-doc="vanHoc">
+                     <div class="document-icon">
+                         <i class="fas fa-book-open"></i>
+                     </div>
+                     <div class="document-name">Văn học đại cương</div>
+                     <div class="document-info">
+                         <i class="fas fa-clock"></i>
+                         Cập nhật: 1 tuần trước
+                     </div>
+                 </div>
+
+                 <div class="document-item" data-doc="tiengAnh">
+                     <div class="document-icon">
+                         <i class="fas fa-language"></i>
+                     </div>
+                     <div class="document-name">Tiếng Anh đại học</div>
+                     <div class="document-info">
+                         <i class="fas fa-clock"></i>
+                         Cập nhật: 3 ngày trước
+                     </div>
+                 </div>
+
+                 <div class="document-item" data-doc="vatLy">
+                     <div class="document-icon">
+                         <i class="fas fa-atom"></i>
+                     </div>
+                     <div class="document-name">Vật lý đại cương</div>
+                     <div class="document-info">
+                         <i class="fas fa-clock"></i>
+                         Cập nhật: 1 ngày trước
+                     </div>
+                 </div>
+            </div>
+        </aside>
+
+        <!-- Chat Area -->
+        <main class="chat-area">
+            <div class="chat-header">
+                                     <h2 class="chat-title">
+                         <i class="fas fa-graduation-cap"></i>
+                         Hỏi đáp với Vincent E Neu
+                     </h2>
+                     <p class="chat-subtitle">Hỏi bất kỳ câu hỏi nào về các môn học</p>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                                 <div class="message ai">
+                     <div class="message-avatar" data-label="Vincent E Neu">
+                         <img src="z6931423474483_5a32b03c376620b1a7e8e5b47f902cec.jpg" alt="Vincent E Neu" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                     </div>
+                     <div class="message-content">
+                         Xin chào! Tôi là Vincent E Neu, trợ lý thông minh hỗ trợ học tập. Tôi có thể giúp bạn tra cứu và tìm đáp án từ các bộ đề thi qua nhiều năm. Bạn có thể hỏi tôi bất kỳ câu hỏi nào liên quan đến các đề thi. Hãy bắt đầu ôn luyện nào!
+                     </div>
+                 </div>
+            </div>
+            
+            <div class="chat-input">
+                <div class="input-container">
+                    <textarea 
+                        class="input-field" 
+                        id="message-input"
+                        placeholder="Nhập câu hỏi của bạn..."
+                        rows="1"
+                    ></textarea>
+                    <button class="send-button" id="send-button">
+                        <i class="fas fa-paper-plane"></i>
+                        Gửi
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Cấu hình
+        const config = {
+            taiLieuHienTai: 'toanHoc'
+        };
+
+        // Biến toàn cục
+        let apiKey = 'AIzaSyCdZmRnl6cUxgo8ObjBcxz135PuFTKNLyo'; // API key mặc định
+
+        // Dữ liệu đề thi mẫu
+        const taiLieu = {
+            toanHoc: {
+                ten: 'Toán cao cấp',
+                noiDung: `
+                    ĐỀ THI TOÁN CAO CẤP - ĐẠI HỌC 2024
+                    
+                    Phần 1: Đại số (50 điểm)
+                    Câu 1: Giải phương trình: x² - 5x + 6 = 0
+                    Đáp án: x = 2 hoặc x = 3
+                    
+                    Câu 2: Tính đạo hàm của hàm số y = x³ - 3x² + 2
+                    Đáp án: y' = 3x² - 6x
+                    
+                    Câu 3: Tìm giá trị lớn nhất của hàm số y = -x² + 4x - 3
+                    Đáp án: y_max = 1 tại x = 2
+                    
+                    Phần 2: Hình học (30 điểm)
+                    Câu 4: Cho tam giác ABC có A(1,2), B(3,4), C(5,6). Tính diện tích.
+                    Đáp án: S = 2 đơn vị diện tích
+                    
+                    Phần 3: Giải tích (20 điểm)
+                    Câu 5: Tính tích phân ∫(x² + 2x)dx từ 0 đến 2
+                    Đáp án: 8/3
+                `
+            },
+            vanHoc: {
+                ten: 'Văn học đại cương',
+                noiDung: `
+                    ĐỀ THI VĂN HỌC ĐẠI CƯƠNG - ĐẠI HỌC 2024
+                    
+                    Phần 1: Đọc hiểu (3 điểm)
+                    Đọc đoạn văn và trả lời câu hỏi:
+                    "Mùa xuân là mùa của sự sống, mùa của hy vọng..."
+                    
+                    Câu 1: Xác định phương thức biểu đạt chính
+                    Đáp án: Miêu tả kết hợp biểu cảm
+                    
+                    Phần 2: Nghị luận văn học (5 điểm)
+                    Câu 2: Phân tích hình ảnh người lính trong bài thơ "Đồng chí"
+                    Đáp án: Hình ảnh người lính hiện lên với tình đồng chí keo sơn...
+                    
+                    Phần 3: Nghị luận xã hội (2 điểm)
+                    Câu 3: Bàn về vai trò của gia đình trong cuộc sống
+                    Đáp án: Gia đình là nền tảng của xã hội...
+                `
+            },
+            tiengAnh: {
+                ten: 'Tiếng Anh đại học',
+                noiDung: `
+                    ĐỀ THI TIẾNG ANH ĐẠI HỌC - 2024
+                    
+                    Phần 1: Ngữ âm (1 điểm)
+                    Câu 1: Chọn từ có phần gạch chân phát âm khác với các từ còn lại
+                    A. cat B. hat C. bat D. date
+                    Đáp án: D (date)
+                    
+                    Phần 2: Từ vựng và ngữ pháp (3 điểm)
+                    Câu 2: Chọn đáp án đúng để hoàn thành câu
+                    "If I _____ rich, I would buy a big house."
+                    A. am B. was C. were D. will be
+                    Đáp án: C (were)
+                    
+                    Phần 3: Đọc hiểu (4 điểm)
+                    Đọc đoạn văn và trả lời câu hỏi về nội dung
+                    Câu 3: What is the main idea of the passage?
+                    Đáp án: The importance of environmental protection
+                    
+                    Phần 4: Viết (2 điểm)
+                    Câu 4: Viết đoạn văn ngắn về chủ đề "My hometown"
+                    Đáp án: Mẫu đoạn văn về quê hương...
+                `
+            },
+            vatLy: {
+                ten: 'Vật lý đại cương',
+                noiDung: `
+                    ĐỀ THI VẬT LÝ ĐẠI CƯƠNG - ĐẠI HỌC 2024
+                    
+                    Phần 1: Cơ học (40 điểm)
+                    Câu 1: Một vật có khối lượng 2kg chuyển động với vận tốc 5m/s. Tính động năng.
+                    Đáp án: Wđ = 25 J
+                    
+                    Câu 2: Tính lực hấp dẫn giữa hai vật có khối lượng 100kg và 200kg, cách nhau 1m.
+                    Đáp án: F = 1,33×10⁻⁶ N
+                    
+                    Phần 2: Điện học (30 điểm)
+                    Câu 3: Cho mạch điện có R = 10Ω, U = 20V. Tính cường độ dòng điện.
+                    Đáp án: I = 2A
+                    
+                    Phần 3: Quang học (20 điểm)
+                    Câu 4: Tính tiêu cự của thấu kính hội tụ có độ tụ D = 5 diop
+                    Đáp án: f = 0,2m = 20cm
+                    
+                    Phần 4: Hạt nhân (10 điểm)
+                    Câu 5: Tính năng lượng liên kết của hạt nhân Heli
+                    Đáp án: E = 28,3 MeV
+                `
+            }
+        };
+
+        // Khởi tạo
+        document.addEventListener('DOMContentLoaded', function() {
+            const oNhapTinNhan = document.getElementById('message-input');
+            const nutGui = document.getElementById('send-button');
+            const khuVucChat = document.getElementById('chat-messages');
+
+            // Tự động điều chỉnh kích thước ô nhập
+            oNhapTinNhan.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+
+            // Gửi tin nhắn
+            function guiTinNhan() {
+                const tinNhan = oNhapTinNhan.value.trim();
+                if (!tinNhan) return;
+
+                // Thêm tin nhắn người dùng
+                themTinNhan(tinNhan, 'nguoiDung');
+                oNhapTinNhan.value = '';
+                oNhapTinNhan.style.height = 'auto';
+
+                // Hiển thị đang tải
+                const idDangTai = themTinNhanDangTai();
+
+                // Gọi API Gemini thực
+                guiTinNhanVoiAPI();
+            }
+
+            // Nhấn nút gửi
+            nutGui.addEventListener('click', guiTinNhan);
+
+            // Nhấn Enter để gửi
+            oNhapTinNhan.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    guiTinNhan();
+                }
+            });
+
+            // Chọn tài liệu
+            document.querySelectorAll('.document-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    // Xóa lớp active
+                    document.querySelectorAll('.document-item').forEach(i => 
+                        i.classList.remove('active')
+                    );
+                    
+                    // Thêm lớp active
+                    this.classList.add('active');
+                    
+                    // Cập nhật tài liệu hiện tại
+                    config.taiLieuHienTai = this.dataset.doc;
+                    
+                                         // Thêm tin nhắn hệ thống
+                     themTinNhan(`Đã chuyển sang bộ đề: ${taiLieu[config.taiLieuHienTai].ten}`, 'ai');
+                });
+            });
+        });
+
+        // Thêm tin nhắn vào chat
+        function themTinNhan(noiDung, nguoiGui) {
+            const khuVucChat = document.getElementById('chat-messages');
+            const divTinNhan = document.createElement('div');
+            divTinNhan.className = `message ${nguoiGui}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            
+            if (nguoiGui === 'nguoiDung') {
+                avatar.textContent = 'B';
+                avatar.setAttribute('data-label', 'Bạn');
+            } else {
+                const logoImg = document.createElement('img');
+                logoImg.src = 'z6931423474483_5a32b03c376620b1a7e8e5b47f902cec.jpg';
+                logoImg.alt = 'Vincent E Neu';
+                logoImg.style.width = '100%';
+                logoImg.style.height = '100%';
+                logoImg.style.objectFit = 'cover';
+                logoImg.style.borderRadius = '50%';
+                avatar.appendChild(logoImg);
+                avatar.setAttribute('data-label', 'Vincent E Neu');
+            }
+            
+            const noiDungTinNhan = document.createElement('div');
+            noiDungTinNhan.className = 'message-content';
+            noiDungTinNhan.textContent = noiDung;
+            
+            divTinNhan.appendChild(avatar);
+            divTinNhan.appendChild(noiDungTinNhan);
+            
+            khuVucChat.appendChild(divTinNhan);
+            khuVucChat.scrollTop = khuVucChat.scrollHeight;
+        }
+
+        // Thêm tin nhắn đang tải
+        function themTinNhanDangTai() {
+            const khuVucChat = document.getElementById('chat-messages');
+            const divDangTai = document.createElement('div');
+            divDangTai.className = 'message ai';
+            divDangTai.id = 'tin-nhan-dang-tai';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.setAttribute('data-label', 'Vincent E Neu');
+            const logoImg = document.createElement('img');
+            logoImg.src = 'z6931423474483_5a32b03c376620b1a7e8e5b47f902cec.jpg';
+            logoImg.alt = 'Vincent E Neu';
+            logoImg.style.width = '100%';
+            logoImg.style.height = '100%';
+            logoImg.style.objectFit = 'cover';
+            logoImg.style.borderRadius = '50%';
+            avatar.appendChild(logoImg);
+            
+            const noiDungDangTai = document.createElement('div');
+            noiDungDangTai.className = 'message-content';
+            noiDungDangTai.innerHTML = `
+                <div class="loading">
+                    <span>Đang tìm tài liệu</span>
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+            
+            divDangTai.appendChild(avatar);
+            divDangTai.appendChild(noiDungDangTai);
+            
+            khuVucChat.appendChild(divDangTai);
+            khuVucChat.scrollTop = khuVucChat.scrollHeight;
+            
+            return 'tin-nhan-dang-tai';
+        }
+
+        // Xóa tin nhắn đang tải
+        function xoaTinNhanDangTai(idDangTai) {
+            const phanTuDangTai = document.getElementById(idDangTai);
+            if (phanTuDangTai) {
+                phanTuDangTai.remove();
+            }
+        }
+
+        // Tạo phản hồi AI (mô phỏng)
+        function taoPhanHoiAI(tinNhanNguoiDung) {
+            const taiLieuHienTai = taiLieu[config.taiLieuHienTai];
+            const noiDungTaiLieu = taiLieuHienTai.noiDung;
+            
+            // Phản hồi dựa trên từ khóa đơn giản
+            const tinNhanThuong = tinNhanNguoiDung.toLowerCase();
+            
+            if (tinNhanThuong.includes('toán') || tinNhanThuong.includes('phương trình')) {
+                return 'Theo đề thi Toán học THPT Quốc gia 2024, để giải phương trình bậc 2: x² - 5x + 6 = 0, ta có đáp án x = 2 hoặc x = 3. Bạn có muốn tôi giải thích chi tiết cách giải không?';
+            }
+            
+            if (tinNhanThuong.includes('đạo hàm') || tinNhanThuong.includes('tính đạo hàm')) {
+                return 'Để tính đạo hàm của hàm số y = x³ - 3x² + 2, ta áp dụng công thức đạo hàm: y\' = 3x² - 6x. Đây là kết quả từ đề thi Toán học 2024.';
+            }
+            
+            if (tinNhanThuong.includes('văn') || tinNhanThuong.includes('nghị luận')) {
+                return 'Trong đề thi Văn học, phần nghị luận văn học chiếm 5 điểm. Ví dụ phân tích hình ảnh người lính trong bài thơ "Đồng chí" - hình ảnh hiện lên với tình đồng chí keo sơn.';
+            }
+            
+            if (tinNhanThuong.includes('tiếng anh') || tinNhanThuong.includes('english')) {
+                return 'Đề thi Tiếng Anh có 4 phần: Ngữ âm (1 điểm), Từ vựng và ngữ pháp (3 điểm), Đọc hiểu (4 điểm), và Viết (2 điểm). Ví dụ câu điều kiện: "If I were rich, I would buy a big house."';
+            }
+            
+            if (tinNhanThuong.includes('vật lý') || tinNhanThuong.includes('cơ học')) {
+                return 'Đề thi Vật lý gồm 4 phần: Cơ học (40 điểm), Điện học (30 điểm), Quang học (20 điểm), và Hạt nhân (10 điểm). Ví dụ tính động năng: Wđ = 25 J cho vật 2kg chuyển động 5m/s.';
+            }
+            
+            if (tinNhanThuong.includes('đáp án') || tinNhanThuong.includes('kết quả')) {
+                return `Dựa trên ${taiLieuHienTai.ten}, tôi có thể giúp bạn tìm đáp án cho các câu hỏi. Bạn hãy hỏi cụ thể về câu nào hoặc môn học nào nhé!`;
+            }
+            
+            // Phản hồi mặc định
+            return `Tôi hiểu câu hỏi của bạn về "${tinNhanNguoiDung}". Dựa trên ${taiLieuHienTai.ten}, tôi có thể giúp bạn tra cứu đáp án và giải thích chi tiết. Bạn có thể hỏi cụ thể về câu hỏi nào hoặc môn học nào không?`;
+        }
+
+        // TODO: Tích hợp với API Gemini thực
+        async function goiAPIGemini(cauHoi) {
+            // Đây là nơi bạn sẽ tích hợp với API Gemini thực
+            // Hiện tại, chúng ta đang sử dụng phản hồi mô phỏng
+            console.log('Sẽ gọi API Gemini với:', cauHoi);
+            return taoPhanHoiAI(cauHoi);
+        }
+
+
+
+        // Cập nhật hàm gửi tin nhắn để sử dụng API thực
+        async function guiTinNhanVoiAPI() {
+            // Hiển thị đang tải
+            const idDangTai = themTinNhanDangTai();
+
+            try {
+                // Lấy tin nhắn cuối cùng từ user
+                const tinNhanElements = document.querySelectorAll('.message.nguoiDung');
+                const tinNhanCuoi = tinNhanElements[tinNhanElements.length - 1];
+                const tinNhan = tinNhanCuoi.querySelector('.message-content').textContent;
+
+                // Gọi API Gemini thực
+                const selectedDoc = taiLieu[config.taiLieuHienTai];
+                const response = await geminiAPI.sendMessageWithContext(tinNhan, selectedDoc);
+                
+                xoaTinNhanDangTai(idDangTai);
+                
+                if (response.success) {
+                    themTinNhan(response.message, 'ai');
+                } else {
+                    themTinNhan('Xin lỗi, tôi không thể xử lý câu hỏi này. Vui lòng thử lại sau.', 'ai');
+                }
+            } catch (error) {
+                xoaTinNhanDangTai(idDangTai);
+                themTinNhan('Có lỗi xảy ra khi kết nối với AI. Vui lòng kiểm tra API key.', 'ai');
+                console.error('Lỗi API:', error);
+            }
+        }
+
+        // Khởi tạo API key
+        geminiAPI.setApiKey(apiKey);
+
+        // Khởi tạo khi trang load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load API config từ admin panel
+            loadApiConfigFromAdmin();
+            
+            // Test kết nối API
+            geminiAPI.testConnection().then(isConnected => {
+                console.log('Gemini API kết nối:', isConnected ? 'Thành công' : 'Thất bại');
+                updateConnectionStatus(isConnected);
+            }).catch(error => {
+                console.error('Lỗi kết nối API:', error);
+                updateConnectionStatus(false);
+            });
+        });
+
+        // Load API config từ admin panel
+        function loadApiConfigFromAdmin() {
+            try {
+                // Load Gemini config
+                const geminiConfig = JSON.parse(localStorage.getItem('gemini_config') || '{}');
+                if (geminiConfig.apiKey) {
+                    geminiAPI.setApiKey(geminiConfig.apiKey);
+                    console.log('Đã load API key từ admin panel');
+                }
+                
+                // Load các API keys khác nếu có
+                const allKeys = [];
+                for (let i = 0; i < 10; i++) { // Check up to 10 keys
+                    const key = localStorage.getItem(`gemini-key-${i}`);
+                    if (key) {
+                        allKeys.push(key);
+                    }
+                }
+                
+                // Nếu có nhiều keys, thêm vào geminiAPI
+                if (allKeys.length > 1) {
+                    allKeys.forEach(key => {
+                        if (key !== geminiConfig.apiKey) {
+                            geminiAPI.addApiKey(key);
+                        }
+                    });
+                    console.log(`Đã load ${allKeys.length} API keys từ admin panel`);
+                }
+                
+            } catch (error) {
+                console.error('Lỗi load API config:', error);
+            }
+        }
+
+        // Update connection status
+        function updateConnectionStatus(isConnected) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (statusElement) {
+                if (isConnected) {
+                    statusElement.innerHTML = '<i class="fas fa-circle"></i><span>Đã kết nối</span>';
+                    statusElement.className = 'connection-status connected';
+                } else {
+                    statusElement.innerHTML = '<i class="fas fa-circle"></i><span>Kết nối thất bại</span>';
+                    statusElement.className = 'connection-status disconnected';
+                }
+            }
+        }
+
+        // Listen for storage changes (when admin updates config)
+        window.addEventListener('storage', function(e) {
+            if (e.key && e.key.includes('gemini')) {
+                console.log('Admin đã cập nhật API config, reloading...');
+                loadApiConfigFromAdmin();
+                
+                // Test connection again
+                geminiAPI.testConnection().then(isConnected => {
+                    updateConnectionStatus(isConnected);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,3231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Vincent E Neu - Quản lý Đề thi</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --warning-color: #fbbc04;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --border-color: #dadce0;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .brand-info h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .brand-info p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .admin-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(251, 188, 4, 0.1);
+            border: 1px solid rgba(251, 188, 4, 0.2);
+            border-radius: 20px;
+            color: var(--warning-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--warning-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Container */
+        .main-container {
+            margin-top: 90px;
+            height: calc(100vh - 90px);
+            display: flex;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .admin-menu {
+            flex: 1;
+            padding: 1rem;
+        }
+
+        .menu-item {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .menu-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .menu-item.active {
+            border-color: var(--primary-color);
+            background: rgba(66, 133, 244, 0.05);
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .menu-text {
+            flex: 1;
+        }
+
+        .menu-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .menu-description {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+        }
+
+        .content-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .content-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .content-body {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: var(--bg-secondary);
+            transition: all 0.2s ease;
+            margin-bottom: 2rem;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(66, 133, 244, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary-color);
+            background: rgba(66, 133, 244, 0.1);
+        }
+
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            margin: 0 auto 1rem;
+        }
+
+        .upload-text h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-text p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(66, 133, 244, 0.3);
+        }
+
+        /* File List */
+        .file-list {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .file-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .file-list-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .file-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-button {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .action-button.edit {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .action-button.delete {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .action-button:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .main-container {
+                margin: 80px 1rem 1rem 1rem;
+                border-radius: 12px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+
+        /* API Management Styles */
+        .api-config-card, .api-usage-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .api-status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .api-status-badge.connected {
+            background: rgba(52, 168, 83, 0.2);
+            color: var(--secondary-color);
+        }
+
+        .api-form {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .form-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .connection-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+
+        .status-item i {
+            color: var(--secondary-color);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3367d6;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #e8eaed;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #f4b400;
+        }
+
+        .usage-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+                 .stat-label {
+             font-size: 0.875rem;
+             color: var(--text-secondary);
+             font-weight: 500;
+         }
+
+         /* Provider Selection Styles */
+         .api-provider-card {
+             background: white;
+             border-radius: 12px;
+             box-shadow: var(--shadow);
+             margin-bottom: 2rem;
+             overflow: hidden;
+         }
+
+         .provider-grid {
+             display: grid;
+             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+             gap: 1rem;
+             padding: 2rem;
+         }
+
+         .provider-item {
+             display: flex;
+             align-items: center;
+             gap: 1rem;
+             padding: 1.5rem;
+             background: var(--bg-secondary);
+             border: 2px solid var(--border-color);
+             border-radius: 12px;
+             transition: all 0.3s ease;
+             cursor: pointer;
+         }
+
+         .provider-item:hover {
+             border-color: var(--primary-color);
+             transform: translateY(-2px);
+             box-shadow: 0 8px 20px rgba(66, 133, 244, 0.1);
+         }
+
+         .provider-item.active {
+             border-color: var(--primary-color);
+             background: rgba(66, 133, 244, 0.05);
+         }
+
+         .provider-icon {
+             width: 50px;
+             height: 50px;
+             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+             border-radius: 12px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             color: white;
+             font-size: 20px;
+         }
+
+         .provider-info {
+             flex: 1;
+         }
+
+         .provider-info h4 {
+             font-size: 1rem;
+             font-weight: 600;
+             color: var(--text-primary);
+             margin-bottom: 0.25rem;
+         }
+
+         .provider-info p {
+             font-size: 0.875rem;
+             color: var(--text-secondary);
+             margin-bottom: 0.5rem;
+         }
+
+         .provider-status {
+             display: flex;
+             align-items: center;
+             gap: 0.5rem;
+             font-size: 0.75rem;
+             font-weight: 500;
+         }
+
+         .provider-status.connected {
+             color: var(--secondary-color);
+         }
+
+         .provider-status.disconnected {
+             color: var(--text-secondary);
+         }
+
+         .provider-status i {
+             font-size: 8px;
+         }
+
+         /* Switch Toggle */
+         .switch {
+             position: relative;
+             display: inline-block;
+             width: 50px;
+             height: 24px;
+         }
+
+         .switch input {
+             opacity: 0;
+             width: 0;
+             height: 0;
+         }
+
+         .slider {
+             position: absolute;
+             cursor: pointer;
+             top: 0;
+             left: 0;
+             right: 0;
+             bottom: 0;
+             background-color: #ccc;
+             transition: .4s;
+             border-radius: 24px;
+         }
+
+         .slider:before {
+             position: absolute;
+             content: "";
+             height: 18px;
+             width: 18px;
+             left: 3px;
+             bottom: 3px;
+             background-color: white;
+             transition: .4s;
+             border-radius: 50%;
+         }
+
+         input:checked + .slider {
+             background-color: var(--primary-color);
+         }
+
+         input:checked + .slider:before {
+             transform: translateX(26px);
+         }
+
+         /* API Provider Config */
+         .api-provider-config {
+             border: 1px solid var(--border-color);
+             border-radius: 8px;
+             padding: 1.5rem;
+             margin-bottom: 1.5rem;
+             background: var(--bg-secondary);
+         }
+
+         .config-header {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             margin-bottom: 1rem;
+             padding-bottom: 0.5rem;
+             border-bottom: 1px solid var(--border-color);
+         }
+
+         .config-header h4 {
+             font-size: 1.125rem;
+             font-weight: 600;
+             color: var(--text-primary);
+             display: flex;
+             align-items: center;
+             gap: 0.5rem;
+         }
+
+         .config-status {
+             padding: 0.25rem 0.75rem;
+             border-radius: 12px;
+             font-size: 0.75rem;
+             font-weight: 500;
+         }
+
+         .config-status.active {
+             background: rgba(52, 168, 83, 0.1);
+             color: var(--secondary-color);
+         }
+
+         .config-status.inactive {
+             background: rgba(95, 99, 104, 0.1);
+             color: var(--text-secondary);
+         }
+
+         /* API Keys Management */
+         .api-keys-container {
+             margin-bottom: 1.5rem;
+         }
+
+         .api-key-item {
+             border: 1px solid var(--border-color);
+             border-radius: 8px;
+             padding: 1rem;
+             margin-bottom: 1rem;
+             background: white;
+             transition: all 0.3s ease;
+         }
+
+         .api-key-item:hover {
+             border-color: var(--primary-color);
+             box-shadow: 0 2px 8px rgba(66, 133, 244, 0.1);
+         }
+
+         .api-key-item.active {
+             border-color: var(--primary-color);
+             background: rgba(66, 133, 244, 0.02);
+         }
+
+         .key-header {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             margin-bottom: 0.75rem;
+         }
+
+         .key-info {
+             display: flex;
+             align-items: center;
+             gap: 1rem;
+         }
+
+         .key-name {
+             font-weight: 600;
+             color: var(--text-primary);
+             font-size: 0.875rem;
+         }
+
+         .key-status {
+             display: flex;
+             align-items: center;
+             gap: 0.25rem;
+             font-size: 0.75rem;
+             font-weight: 500;
+             padding: 0.25rem 0.5rem;
+             border-radius: 12px;
+         }
+
+         .key-status.connected {
+             background: rgba(52, 168, 83, 0.1);
+             color: var(--secondary-color);
+         }
+
+         .key-status.disconnected {
+             background: rgba(234, 67, 53, 0.1);
+             color: #ea4335;
+         }
+
+         .key-status.limited {
+             background: rgba(251, 188, 5, 0.1);
+             color: #fbbc05;
+         }
+
+         .key-actions {
+             display: flex;
+             gap: 0.5rem;
+         }
+
+         .key-input-group {
+             margin-bottom: 0.75rem;
+         }
+
+         .key-metrics {
+             display: flex;
+             gap: 1.5rem;
+             font-size: 0.75rem;
+         }
+
+         .metric {
+             display: flex;
+             flex-direction: column;
+             gap: 0.25rem;
+         }
+
+         .metric-label {
+             color: var(--text-secondary);
+             font-weight: 500;
+         }
+
+         .metric-value {
+             font-weight: 600;
+             color: var(--text-primary);
+         }
+
+         .metric-value.success {
+             color: var(--secondary-color);
+         }
+
+         .metric-value.warning {
+             color: #fbbc05;
+         }
+
+         .metric-value.error {
+             color: #ea4335;
+         }
+
+         /* Fallback Strategy */
+         .fallback-strategy {
+             display: flex;
+             flex-direction: column;
+             gap: 0.75rem;
+         }
+
+         .checkbox-label {
+             display: flex;
+             align-items: center;
+             gap: 0.5rem;
+             cursor: pointer;
+             font-size: 0.875rem;
+             color: var(--text-primary);
+         }
+
+         .checkbox-label input[type="checkbox"] {
+             display: none;
+         }
+
+         .checkmark {
+             width: 18px;
+             height: 18px;
+             border: 2px solid var(--border-color);
+             border-radius: 4px;
+             position: relative;
+             transition: all 0.3s ease;
+         }
+
+         .checkbox-label input[type="checkbox"]:checked + .checkmark {
+             background: var(--primary-color);
+             border-color: var(--primary-color);
+         }
+
+         .checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+             content: '✓';
+             position: absolute;
+             top: 50%;
+             left: 50%;
+             transform: translate(-50%, -50%);
+             color: white;
+             font-size: 12px;
+             font-weight: bold;
+         }
+
+         /* Button Styles */
+         .btn-sm {
+             padding: 0.375rem 0.75rem;
+             font-size: 0.75rem;
+         }
+
+         .btn-outline {
+             background: transparent;
+             border: 1px solid var(--primary-color);
+             color: var(--primary-color);
+         }
+
+         .btn-outline:hover {
+             background: var(--primary-color);
+             color: white;
+         }
+
+         .btn-info {
+             background: #17a2b8;
+             color: white;
+         }
+
+         .btn-info:hover {
+             background: #138496;
+         }
+
+         /* Share Links Styles */
+         .share-links-container {
+             display: flex;
+             flex-direction: column;
+             gap: 1rem;
+         }
+
+         .share-link-item {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             padding: 1rem;
+             background: var(--bg-secondary);
+             border: 1px solid var(--border-color);
+             border-radius: 8px;
+             transition: all 0.3s ease;
+         }
+
+         .share-link-item:hover {
+             border-color: var(--primary-color);
+             box-shadow: 0 2px 8px rgba(66, 133, 244, 0.1);
+         }
+
+         .share-link-info {
+             display: flex;
+             flex-direction: column;
+             gap: 0.25rem;
+         }
+
+         .share-link-name {
+             font-weight: 600;
+             color: var(--text-primary);
+             font-size: 0.875rem;
+         }
+
+         .share-link-url {
+             font-family: 'Courier New', monospace;
+             font-size: 0.75rem;
+             color: var(--text-secondary);
+             background: white;
+             padding: 0.25rem 0.5rem;
+             border-radius: 4px;
+             border: 1px solid var(--border-color);
+         }
+
+         .share-link-actions {
+             display: flex;
+             gap: 0.5rem;
+         }
+
+         /* Upload Progress Styles */
+         .upload-progress {
+             background: white;
+             border-radius: 12px;
+             padding: 1.5rem;
+             margin-bottom: 2rem;
+             box-shadow: var(--shadow);
+             border: 1px solid var(--border-color);
+         }
+
+         .progress-header {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             margin-bottom: 1rem;
+         }
+
+         .progress-header h4 {
+             font-size: 1rem;
+             font-weight: 600;
+             color: var(--text-primary);
+             margin: 0;
+         }
+
+         .progress-bar {
+             width: 100%;
+             height: 8px;
+             background: var(--bg-secondary);
+             border-radius: 4px;
+             overflow: hidden;
+             margin-bottom: 0.5rem;
+         }
+
+         .progress-fill {
+             height: 100%;
+             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+             border-radius: 4px;
+             transition: width 0.3s ease;
+             width: 0%;
+         }
+
+         .progress-text {
+             font-size: 0.875rem;
+             color: var(--text-secondary);
+             text-align: center;
+             font-weight: 500;
+         }
+
+         /* File Processing Styles */
+         .file-processing {
+             background: white;
+             border-radius: 12px;
+             padding: 1.5rem;
+             margin-bottom: 2rem;
+             box-shadow: var(--shadow);
+             border: 1px solid var(--border-color);
+         }
+
+         .processing-header {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             margin-bottom: 1.5rem;
+         }
+
+         .processing-header h4 {
+             font-size: 1rem;
+             font-weight: 600;
+             color: var(--text-primary);
+             margin: 0;
+         }
+
+         .processing-spinner {
+             color: var(--primary-color);
+             font-size: 1.2rem;
+         }
+
+         .processing-steps {
+             display: flex;
+             justify-content: space-between;
+             gap: 1rem;
+         }
+
+         .step {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             gap: 0.5rem;
+             flex: 1;
+             padding: 1rem;
+             border-radius: 8px;
+             background: var(--bg-secondary);
+             transition: all 0.3s ease;
+         }
+
+         .step.active {
+             background: rgba(66, 133, 244, 0.1);
+             color: var(--primary-color);
+         }
+
+         .step.completed {
+             background: rgba(52, 168, 83, 0.1);
+             color: var(--secondary-color);
+         }
+
+         .step i {
+             font-size: 1.5rem;
+         }
+
+         .step span {
+             font-size: 0.75rem;
+             font-weight: 500;
+             text-align: center;
+         }
+
+         /* File List Enhanced */
+         .file-item {
+             position: relative;
+             overflow: hidden;
+         }
+
+         .file-status {
+             position: absolute;
+             top: 0.5rem;
+             right: 0.5rem;
+             padding: 0.25rem 0.5rem;
+             border-radius: 12px;
+             font-size: 0.75rem;
+             font-weight: 500;
+         }
+
+         .file-status.uploading {
+             background: rgba(251, 188, 4, 0.1);
+             color: var(--warning-color);
+         }
+
+         .file-status.processed {
+             background: rgba(52, 168, 83, 0.1);
+             color: var(--secondary-color);
+         }
+
+         .file-status.error {
+             background: rgba(234, 67, 53, 0.1);
+             color: var(--accent-color);
+         }
+
+         .file-actions {
+             display: flex;
+             gap: 0.5rem;
+         }
+
+         .file-actions .btn {
+             padding: 0.25rem 0.5rem;
+             font-size: 0.75rem;
+         }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="z6931423474483_5a32b03c376620b1a7e8e5b47f902cec.jpg" alt="Vincent E Neu - Admin" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div class="brand-info">
+                    <h1>Vincent E Neu</h1>
+                    <p>Admin - Quản lý Đề thi</p>
+                </div>
+            </div>
+            <div class="admin-status">
+                <div class="status-dot"></div>
+                <span>Admin Mode</span>
+                <div class="user-info" style="margin-left: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">Admin:</span>
+                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--primary-color);" id="admin-name"></span>
+                    <button onclick="logout()" style="background: none; border: none; color: var(--accent-color); cursor: pointer; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; transition: all 0.2s ease;">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-cog"></i>
+                    Quản lý hệ thống
+                </h3>
+                <p class="sidebar-subtitle">Chỉ dành cho Admin</p>
+            </div>
+            
+            <div class="admin-menu">
+                <div class="menu-item active" data-section="upload">
+                    <div class="menu-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <div class="menu-text">
+                        <div class="menu-title">Upload đề thi</div>
+                        <div class="menu-description">Thêm đề thi mới vào hệ thống</div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-section="manage">
+                    <div class="menu-icon">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <div class="menu-text">
+                        <div class="menu-title">Quản lý đề thi</div>
+                        <div class="menu-description">Xem, sửa, xóa đề thi</div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-section="share">
+                    <div class="menu-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <div class="menu-text">
+                        <div class="menu-title">Chia sẻ môn học</div>
+                        <div class="menu-description">Tạo link riêng cho từng môn</div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-section="users">
+                    <div class="menu-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="menu-text">
+                        <div class="menu-title">Quản lý người dùng</div>
+                        <div class="menu-description">Xem thống kê sử dụng</div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-section="api">
+                    <div class="menu-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="menu-text">
+                        <div class="menu-title">Quản lý API</div>
+                        <div class="menu-description">Cấu hình Gemini AI</div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-section="accounts">
+                    <div class="menu-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <div class="menu-text">
+                        <div class="menu-title">Quản lý tài khoản</div>
+                        <div class="menu-description">Tạo và quản lý user</div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-section="settings">
+                    <div class="menu-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="menu-text">
+                        <div class="menu-title">Cài đặt hệ thống</div>
+                        <div class="menu-description">Cấu hình và bảo mật</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h2 class="content-title">
+                    <i class="fas fa-upload"></i>
+                    Upload đề thi mới
+                </h2>
+                <p class="content-subtitle">Thêm đề thi mới vào hệ thống để người dùng có thể tra cứu</p>
+            </div>
+            
+            <div class="content-body">
+                <!-- Upload Area -->
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-text">
+                        <h3>Kéo thả file đề thi vào đây</h3>
+                        <p>Hoặc click để chọn file (PDF, DOC, DOCX, TXT)</p>
+                        <button class="upload-button" onclick="document.getElementById('file-input').click()">
+                            <i class="fas fa-folder-open"></i>
+                            Chọn file
+                        </button>
+                    </div>
+                    <input type="file" id="file-input" accept=".pdf,.doc,.docx,.txt" multiple style="display: none;">
+                </div>
+
+                <!-- Upload Progress -->
+                <div class="upload-progress" id="upload-progress" style="display: none;">
+                    <div class="progress-header">
+                        <h4>Đang upload file...</h4>
+                        <button class="btn btn-sm btn-secondary" onclick="cancelUpload()">
+                            <i class="fas fa-times"></i>
+                            Hủy
+                            </button>
+                        </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-text" id="progress-text">0%</div>
+                    </div>
+
+                <!-- File Processing -->
+                <div class="file-processing" id="file-processing" style="display: none;">
+                    <div class="processing-header">
+                        <h4>Đang xử lý file...</h4>
+                        <div class="processing-spinner">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                            </div>
+                    <div class="processing-steps">
+                        <div class="step" id="step-1">
+                            <i class="fas fa-file-upload"></i>
+                            <span>Upload file</span>
+                        </div>
+                        <div class="step" id="step-2">
+                            <i class="fas fa-cog"></i>
+                            <span>Xử lý nội dung</span>
+                        </div>
+                        <div class="step" id="step-3">
+                            <i class="fas fa-database"></i>
+                            <span>Lưu vào hệ thống</span>
+                    </div>
+                        </div>
+                    </div>
+
+                <!-- File List -->
+                <div class="file-list">
+                    <!-- File list will be loaded dynamically -->
+                </div>
+
+                                 <!-- API Management Section -->
+                 <div class="content-section" id="api-section" style="display: none;">
+                     <div class="content-header">
+                         <div class="content-title">
+                             <i class="fas fa-key"></i>
+                             Quản lý API
+                         </div>
+                         <div class="content-subtitle">
+                             Cấu hình và quản lý nhiều AI Provider
+                         </div>
+                     </div>
+                     
+                     <div class="content-body">
+                         <!-- Provider Selection -->
+                         <div class="api-provider-card">
+                             <div class="card-header">
+                                 <h3><i class="fas fa-server"></i> Chọn AI Provider</h3>
+                             </div>
+                             
+                             <div class="api-form">
+                                 <div class="provider-grid">
+                                     <div class="provider-item active" data-provider="gemini">
+                                         <div class="provider-icon">
+                                             <i class="fas fa-robot"></i>
+                                         </div>
+                                         <div class="provider-info">
+                                             <h4>Google Gemini</h4>
+                                             <p>AI mạnh mẽ từ Google</p>
+                                             <div class="provider-status connected">
+                                                 <i class="fas fa-circle"></i>
+                                                 <span>Đang hoạt động</span>
+                                             </div>
+                                         </div>
+                                         <div class="provider-toggle">
+                                             <label class="switch">
+                                                 <input type="checkbox" checked onchange="toggleProvider('gemini', this.checked)">
+                                                 <span class="slider"></span>
+                                             </label>
+                                         </div>
+                                     </div>
+                                     
+                                     <div class="provider-item" data-provider="openai">
+                                         <div class="provider-icon">
+                                             <i class="fas fa-brain"></i>
+                                         </div>
+                                         <div class="provider-info">
+                                             <h4>OpenAI GPT</h4>
+                                             <p>ChatGPT và GPT-4</p>
+                                             <div class="provider-status disconnected">
+                                                 <i class="fas fa-circle"></i>
+                                                 <span>Chưa cấu hình</span>
+                                             </div>
+                                         </div>
+                                         <div class="provider-toggle">
+                                             <label class="switch">
+                                                 <input type="checkbox" onchange="toggleProvider('openai', this.checked)">
+                                                 <span class="slider"></span>
+                                             </label>
+                                         </div>
+                                     </div>
+                                     
+                                     <div class="provider-item" data-provider="claude">
+                                         <div class="provider-icon">
+                                             <i class="fas fa-user-tie"></i>
+                                         </div>
+                                         <div class="provider-info">
+                                             <h4>Anthropic Claude</h4>
+                                             <p>Claude 3 từ Anthropic</p>
+                                             <div class="provider-status disconnected">
+                                                 <i class="fas fa-circle"></i>
+                                                 <span>Chưa cấu hình</span>
+                                             </div>
+                                         </div>
+                                         <div class="provider-toggle">
+                                             <label class="switch">
+                                                 <input type="checkbox" onchange="toggleProvider('claude', this.checked)">
+                                                 <span class="slider"></span>
+                                             </label>
+                                         </div>
+                                     </div>
+                                     
+                                     <div class="provider-item" data-provider="local">
+                                         <div class="provider-icon">
+                                             <i class="fas fa-home"></i>
+                                         </div>
+                                         <div class="provider-info">
+                                             <h4>Local AI</h4>
+                                             <p>AI chạy trên server</p>
+                                             <div class="provider-status disconnected">
+                                                 <i class="fas fa-circle"></i>
+                                                 <span>Chưa cấu hình</span>
+                                             </div>
+                                         </div>
+                                         <div class="provider-toggle">
+                                             <label class="switch">
+                                                 <input type="checkbox" onchange="toggleProvider('local', this.checked)">
+                                                 <span class="slider"></span>
+                                             </label>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <!-- API Configuration -->
+                         <div class="api-config-card">
+                             <div class="card-header">
+                                 <h3><i class="fas fa-cog"></i> Cấu hình API Keys</h3>
+                                 <div class="api-status-badge connected">
+                                     <i class="fas fa-circle"></i>
+                                     <span>Gemini đang hoạt động</span>
+                                 </div>
+                             </div>
+                             
+                             <div class="api-form">
+                                 <!-- Gemini Configuration -->
+                                 <div class="api-provider-config" id="gemini-config">
+                                     <div class="config-header">
+                                         <h4><i class="fas fa-robot"></i> Google Gemini</h4>
+                                         <span class="config-status active">Đang sử dụng</span>
+                                         <button class="btn btn-sm btn-outline" onclick="addApiKey('gemini')">
+                                             <i class="fas fa-plus"></i>
+                                             Thêm Key
+                                         </button>
+                                     </div>
+                                     
+                                     <div class="api-keys-container" id="gemini-keys-container">
+                                         <div class="api-key-item active" data-key-index="0">
+                                             <div class="key-header">
+                                                 <div class="key-info">
+                                                     <span class="key-name">API Key #1 (Chính)</span>
+                                                     <span class="key-status connected">
+                                                         <i class="fas fa-circle"></i>
+                                                         Đang hoạt động
+                                                     </span>
+                                                 </div>
+                                                 <div class="key-actions">
+                                                     <button class="btn btn-sm btn-secondary" onclick="toggleApiKeyVisibility('gemini-key-0')">
+                                                         <i class="fas fa-eye"></i>
+                                                     </button>
+                                                     <button class="btn btn-sm btn-warning" onclick="removeApiKey('gemini', 0)">
+                                                         <i class="fas fa-trash"></i>
+                                                     </button>
+                                                 </div>
+                                             </div>
+                                             <div class="key-input-group">
+                                                 <input type="password" id="gemini-key-0" class="form-input" 
+                                                        value="AIzaSyCdZmRnl6cUxgo8ObjBcxz135PuFTKNLyo" 
+                                                        placeholder="Nhập Gemini API key...">
+                                             </div>
+                                             <div class="key-metrics">
+                                                 <div class="metric">
+                                                     <span class="metric-label">Requests:</span>
+                                                     <span class="metric-value">1,247</span>
+                                                 </div>
+                                                 <div class="metric">
+                                                     <span class="metric-label">Limit:</span>
+                                                     <span class="metric-value">15/min</span>
+                                                 </div>
+                                                 <div class="metric">
+                                                     <span class="metric-label">Status:</span>
+                                                     <span class="metric-value success">OK</span>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                     
+                                     <div class="form-group">
+                                         <label for="geminiModel">Model:</label>
+                                         <select id="geminiModel" class="form-input">
+                                             <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Khuyến nghị)</option>
+                                             <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                                             <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                                         </select>
+                                     </div>
+                                     
+                                     <div class="form-group">
+                                         <label>Chiến lược Fallback:</label>
+                                         <div class="fallback-strategy">
+                                             <label class="checkbox-label">
+                                                 <input type="checkbox" id="geminiAutoFallback" checked>
+                                                 <span class="checkmark"></span>
+                                                 Tự động chuyển key khi bị giới hạn
+                                             </label>
+                                             <label class="checkbox-label">
+                                                 <input type="checkbox" id="geminiLoadBalance" checked>
+                                                 <span class="checkmark"></span>
+                                                 Cân bằng tải giữa các key
+                                             </label>
+                                         </div>
+                                     </div>
+                                     
+                                     <div class="form-actions">
+                                         <button class="btn btn-primary" onclick="saveApiConfig('gemini')">
+                                             <i class="fas fa-save"></i>
+                                             Lưu Gemini
+                                         </button>
+                                         <button class="btn btn-secondary" onclick="testAllApiKeys('gemini')">
+                                             <i class="fas fa-test-tube"></i>
+                                             Test tất cả Keys
+                                         </button>
+                                         <button class="btn btn-info" onclick="showApiKeyStats('gemini')">
+                                             <i class="fas fa-chart-bar"></i>
+                                             Thống kê
+                                         </button>
+                                     </div>
+                                 </div>
+
+                                 <!-- OpenAI Configuration -->
+                                 <div class="api-provider-config" id="openai-config" style="display: none;">
+                                     <div class="config-header">
+                                         <h4><i class="fas fa-brain"></i> OpenAI GPT</h4>
+                                         <span class="config-status inactive">Chưa sử dụng</span>
+                                     </div>
+                                     
+                                     <div class="form-group">
+                                         <label for="openaiApiKey">API Key OpenAI:</label>
+                                         <div class="input-group">
+                                             <input type="password" id="openaiApiKey" class="form-input" 
+                                                    placeholder="Nhập OpenAI API key...">
+                                             <button class="btn btn-secondary" onclick="toggleApiKeyVisibility('openaiApiKey')">
+                                                 <i class="fas fa-eye"></i>
+                                             </button>
+                                         </div>
+                                     </div>
+                                     
+                                     <div class="form-group">
+                                         <label for="openaiModel">Model:</label>
+                                         <select id="openaiModel" class="form-input">
+                                             <option value="gpt-4o">GPT-4o (Khuyến nghị)</option>
+                                             <option value="gpt-4o-mini">GPT-4o Mini</option>
+                                             <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                                             <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                         </select>
+                                     </div>
+                                     
+                                     <div class="form-actions">
+                                         <button class="btn btn-primary" onclick="saveApiConfig('openai')">
+                                             <i class="fas fa-save"></i>
+                                             Lưu OpenAI
+                                         </button>
+                                         <button class="btn btn-secondary" onclick="testApiConnection('openai')">
+                                             <i class="fas fa-test-tube"></i>
+                                             Test
+                                         </button>
+                                     </div>
+                                 </div>
+
+                                 <!-- Claude Configuration -->
+                                 <div class="api-provider-config" id="claude-config" style="display: none;">
+                                     <div class="config-header">
+                                         <h4><i class="fas fa-user-tie"></i> Anthropic Claude</h4>
+                                         <span class="config-status inactive">Chưa sử dụng</span>
+                                     </div>
+                                     
+                                     <div class="form-group">
+                                         <label for="claudeApiKey">API Key Claude:</label>
+                                         <div class="input-group">
+                                             <input type="password" id="claudeApiKey" class="form-input" 
+                                                    placeholder="Nhập Claude API key...">
+                                             <button class="btn btn-secondary" onclick="toggleApiKeyVisibility('claudeApiKey')">
+                                                 <i class="fas fa-eye"></i>
+                                             </button>
+                                         </div>
+                                     </div>
+                                     
+                                     <div class="form-group">
+                                         <label for="claudeModel">Model:</label>
+                                         <select id="claudeModel" class="form-input">
+                                             <option value="claude-3-5-sonnet">Claude 3.5 Sonnet (Khuyến nghị)</option>
+                                             <option value="claude-3-opus">Claude 3 Opus</option>
+                                             <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+                                             <option value="claude-3-haiku">Claude 3 Haiku</option>
+                                         </select>
+                                     </div>
+                                     
+                                     <div class="form-actions">
+                                         <button class="btn btn-primary" onclick="saveApiConfig('claude')">
+                                             <i class="fas fa-save"></i>
+                                             Lưu Claude
+                                         </button>
+                                         <button class="btn btn-secondary" onclick="testApiConnection('claude')">
+                                             <i class="fas fa-test-tube"></i>
+                                             Test
+                                         </button>
+                                     </div>
+                                 </div>
+
+                                 <!-- Local AI Configuration -->
+                                 <div class="api-provider-config" id="local-config" style="display: none;">
+                                     <div class="config-header">
+                                         <h4><i class="fas fa-home"></i> Local AI Server</h4>
+                                         <span class="config-status inactive">Chưa sử dụng</span>
+                                     </div>
+                                     
+                                     <div class="form-group">
+                                         <label for="localServerUrl">Server URL:</label>
+                                         <input type="text" id="localServerUrl" class="form-input" 
+                                                placeholder="http://localhost:8000/api/chat">
+                                     </div>
+                                     
+                                     <div class="form-group">
+                                         <label for="localModel">Model:</label>
+                                         <select id="localModel" class="form-input">
+                                             <option value="llama-3-8b">Llama 3 8B</option>
+                                             <option value="llama-3-70b">Llama 3 70B</option>
+                                             <option value="mistral-7b">Mistral 7B</option>
+                                             <option value="codellama">Code Llama</option>
+                                         </select>
+                                     </div>
+                                     
+                                     <div class="form-actions">
+                                         <button class="btn btn-primary" onclick="saveApiConfig('local')">
+                                             <i class="fas fa-save"></i>
+                                             Lưu Local
+                                         </button>
+                                         <button class="btn btn-secondary" onclick="testApiConnection('local')">
+                                             <i class="fas fa-test-tube"></i>
+                                             Test
+                                         </button>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                        
+                        <div class="api-usage-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-chart-bar"></i> Thống kê sử dụng</h3>
+                            </div>
+                            
+                            <div class="usage-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">1,247</div>
+                                    <div class="stat-label">Tổng câu hỏi</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">89%</div>
+                                    <div class="stat-label">Tỷ lệ thành công</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">2.3s</div>
+                                    <div class="stat-label">Thời gian phản hồi TB</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">15/60</div>
+                                    <div class="stat-label">Requests/phút</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                 </div>
+
+                 <!-- Manage Exams Section -->
+                 <div class="content-section" id="manage-section" style="display: none;">
+                     <div class="content-header">
+                         <div class="content-title">
+                             <i class="fas fa-folder-open"></i>
+                             Quản lý đề thi
+                         </div>
+                         <div class="content-subtitle">
+                             Xem, sửa, xóa và quản lý đề thi trong hệ thống
+                         </div>
+                     </div>
+                     
+                     <div class="content-body">
+                         <div class="file-list">
+                             <div class="file-list-header">
+                                 <h3 class="file-list-title">Tất cả đề thi</h3>
+                                 <span>4 files</span>
+                             </div>
+                             
+                             <div class="file-item">
+                                 <div class="file-icon">
+                                     <i class="fas fa-file-pdf"></i>
+                                 </div>
+                                 <div class="file-info">
+                                     <div class="file-name">Đề thi Toán cao cấp 2024.pdf</div>
+                                     <div class="file-meta">
+                                         <span>2.5 MB</span>
+                                         <span>Upload: 2 ngày trước</span>
+                                         <span>Toán cao cấp</span>
+                                     </div>
+                                 </div>
+                                 <div class="file-actions">
+                                     <button class="action-button edit">
+                                         <i class="fas fa-edit"></i>
+                                     </button>
+                                     <button class="action-button delete">
+                                         <i class="fas fa-trash"></i>
+                                     </button>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Users Management Section -->
+                 <div class="content-section" id="users-section" style="display: none;">
+                     <div class="content-header">
+                         <div class="content-title">
+                             <i class="fas fa-users"></i>
+                             Quản lý người dùng
+                         </div>
+                         <div class="content-subtitle">
+                             Thống kê sử dụng và quản lý người dùng
+                         </div>
+                     </div>
+                     
+                     <div class="content-body">
+                         <div class="api-usage-card">
+                             <div class="card-header">
+                                 <h3><i class="fas fa-chart-bar"></i> Thống kê người dùng</h3>
+                             </div>
+                             
+                             <div class="usage-stats">
+                                 <div class="stat-item">
+                                     <div class="stat-value">156</div>
+                                     <div class="stat-label">Người dùng hoạt động</div>
+                                 </div>
+                                 <div class="stat-item">
+                                     <div class="stat-value">1,247</div>
+                                     <div class="stat-label">Tổng câu hỏi</div>
+                                 </div>
+                                 <div class="stat-item">
+                                     <div class="stat-value">89%</div>
+                                     <div class="stat-label">Tỷ lệ hài lòng</div>
+                                 </div>
+                                 <div class="stat-item">
+                                     <div class="stat-value">2.3s</div>
+                                     <div class="stat-label">Thời gian phản hồi TB</div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Share Subjects Section -->
+                 <div class="content-section" id="share-section" style="display: none;">
+                     <div class="content-header">
+                         <div class="content-title">
+                             <i class="fas fa-share-alt"></i>
+                             Chia sẻ môn học
+                         </div>
+                         <div class="content-subtitle">
+                             Tạo link riêng cho từng môn học để chia sẻ với người dùng
+                         </div>
+                     </div>
+                     
+                     <div class="content-body">
+                         <!-- Subject Sharing Cards -->
+                         <div class="api-config-card">
+                             <div class="card-header">
+                                 <h3><i class="fas fa-graduation-cap"></i> Quản lý link chia sẻ</h3>
+                             </div>
+                             
+                             <div class="api-form">
+                                 <div class="form-group">
+                                     <label>Hướng dẫn:</label>
+                                     <div class="connection-status">
+                                         <div class="status-item">
+                                             <i class="fas fa-info-circle"></i>
+                                             <span>Tạo link riêng cho từng môn học</span>
+                                         </div>
+                                         <div class="status-item">
+                                             <i class="fas fa-users"></i>
+                                             <span>Người dùng thường chỉ thấy môn được chia sẻ</span>
+                                         </div>
+                                         <div class="status-item">
+                                             <i class="fas fa-crown"></i>
+                                             <span>VIP mới được truy cập toàn bộ hệ thống</span>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <!-- Subject Cards -->
+                         <div class="provider-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+                             <!-- Toán cao cấp -->
+                             <div class="provider-item" data-subject="toanHoc">
+                                 <div class="provider-icon">
+                                     <i class="fas fa-calculator"></i>
+                                 </div>
+                                 <div class="provider-info">
+                                     <h4>Toán cao cấp</h4>
+                                     <p>Đề thi và đáp án Toán cao cấp</p>
+                                     <div class="provider-status connected">
+                                         <i class="fas fa-circle"></i>
+                                         <span>Đang hoạt động</span>
+                                     </div>
+                                 </div>
+                                 <div class="provider-toggle">
+                                     <label class="switch">
+                                         <input type="checkbox" checked onchange="toggleSubjectShare('toanHoc', this.checked)">
+                                         <span class="slider"></span>
+                                     </label>
+                                 </div>
+                             </div>
+
+                             <!-- Văn học đại cương -->
+                             <div class="provider-item" data-subject="vanHoc">
+                                 <div class="provider-icon">
+                                     <i class="fas fa-book-open"></i>
+                                 </div>
+                                 <div class="provider-info">
+                                     <h4>Văn học đại cương</h4>
+                                     <p>Đề thi và đáp án Văn học</p>
+                                     <div class="provider-status connected">
+                                         <i class="fas fa-circle"></i>
+                                         <span>Đang hoạt động</span>
+                                     </div>
+                                 </div>
+                                 <div class="provider-toggle">
+                                     <label class="switch">
+                                         <input type="checkbox" checked onchange="toggleSubjectShare('vanHoc', this.checked)">
+                                         <span class="slider"></span>
+                                     </label>
+                                 </div>
+                             </div>
+
+                             <!-- Tiếng Anh đại học -->
+                             <div class="provider-item" data-subject="tiengAnh">
+                                 <div class="provider-icon">
+                                     <i class="fas fa-language"></i>
+                                 </div>
+                                 <div class="provider-info">
+                                     <h4>Tiếng Anh đại học</h4>
+                                     <p>Đề thi và đáp án Tiếng Anh</p>
+                                     <div class="provider-status connected">
+                                         <i class="fas fa-circle"></i>
+                                         <span>Đang hoạt động</span>
+                                     </div>
+                                 </div>
+                                 <div class="provider-toggle">
+                                     <label class="switch">
+                                         <input type="checkbox" checked onchange="toggleSubjectShare('tiengAnh', this.checked)">
+                                         <span class="slider"></span>
+                                     </label>
+                                 </div>
+                             </div>
+
+                             <!-- Vật lý đại cương -->
+                             <div class="provider-item" data-subject="vatLy">
+                                 <div class="provider-icon">
+                                     <i class="fas fa-atom"></i>
+                                 </div>
+                                 <div class="provider-info">
+                                     <h4>Vật lý đại cương</h4>
+                                     <p>Đề thi và đáp án Vật lý</p>
+                                     <div class="provider-status connected">
+                                         <i class="fas fa-circle"></i>
+                                         <span>Đang hoạt động</span>
+                                     </div>
+                                 </div>
+                                 <div class="provider-toggle">
+                                     <label class="switch">
+                                         <input type="checkbox" checked onchange="toggleSubjectShare('vatLy', this.checked)">
+                                         <span class="slider"></span>
+                                     </label>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <!-- Share Links Management -->
+                         <div class="api-config-card">
+                             <div class="card-header">
+                                 <h3><i class="fas fa-link"></i> Link chia sẻ</h3>
+                             </div>
+                             
+                             <div class="api-form">
+                                                                   <div class="form-group">
+                                      <label>Link chia sẻ hiện tại:</label>
+                                      <div class="share-links-container" id="shared-links-container">
+                                          <!-- Shared links will be loaded here -->
+                                      </div>
+                                  </div>
+                                 
+                                 <div class="form-group">
+                                     <label>Link VIP (Toàn bộ hệ thống):</label>
+                                     <div class="share-link-item">
+                                         <div class="share-link-info">
+                                             <span class="share-link-name">VIP - Toàn bộ hệ thống</span>
+                                             <span class="share-link-url">index.html?vip=true</span>
+                                         </div>
+                                         <div class="share-link-actions">
+                                             <button class="btn btn-sm btn-secondary" onclick="copyShareLink('vip')">
+                                                 <i class="fas fa-copy"></i>
+                                                 Copy
+                                             </button>
+                                             <button class="btn btn-sm btn-warning" onclick="previewShareLink('vip')">
+                                                 <i class="fas fa-crown"></i>
+                                                 VIP Preview
+                                             </button>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Accounts Management Section -->
+                 <div class="content-section" id="accounts-section" style="display: none;">
+                     <div class="content-header">
+                         <div class="content-title">
+                             <i class="fas fa-users-cog"></i>
+                             Quản lý tài khoản
+                         </div>
+                         <div class="content-subtitle">
+                             Tạo và quản lý tài khoản người dùng
+                         </div>
+                     </div>
+                     
+                     <div class="content-body">
+                         <!-- Account Creation -->
+                         <div class="api-config-card">
+                             <div class="card-header">
+                                 <h3><i class="fas fa-user-plus"></i> Tạo tài khoản mới</h3>
+                             </div>
+                             
+                             <div class="api-form">
+                                 <div class="form-group">
+                                     <label for="newUsername">Tên đăng nhập:</label>
+                                     <input type="text" id="newUsername" class="form-input" placeholder="Nhập tên đăng nhập">
+                                 </div>
+                                 
+                                 <div class="form-group">
+                                     <label for="newPassword">Mật khẩu:</label>
+                                     <input type="password" id="newPassword" class="form-input" placeholder="Nhập mật khẩu">
+                                 </div>
+                                 
+                                 <div class="form-group">
+                                     <label for="newRole">Loại tài khoản:</label>
+                                     <select id="newRole" class="form-input">
+                                         <option value="user">Người dùng thường</option>
+                                         <option value="vip">VIP - Toàn bộ hệ thống</option>
+                                         <option value="subject">Môn học cụ thể</option>
+                                     </select>
+                                 </div>
+                                 
+                                 <div class="form-group" id="subjectSelectGroup" style="display: none;">
+                                     <label for="newSubject">Chọn môn học:</label>
+                                     <select id="newSubject" class="form-input">
+                                         <option value="toanHoc">Toán cao cấp</option>
+                                         <option value="vanHoc">Văn học đại cương</option>
+                                         <option value="tiengAnh">Tiếng Anh đại học</option>
+                                         <option value="vatLy">Vật lý đại cương</option>
+                                     </select>
+                                 </div>
+                                 
+                                 <div class="form-actions">
+                                     <button class="btn btn-primary" onclick="createAccount()">
+                                         <i class="fas fa-plus"></i>
+                                         Tạo tài khoản
+                                     </button>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <!-- Account List -->
+                         <div class="api-config-card">
+                             <div class="card-header">
+                                 <h3><i class="fas fa-list"></i> Danh sách tài khoản</h3>
+                             </div>
+                             
+                             <div class="api-form">
+                                 <div class="share-links-container" id="accountsList">
+                                     <!-- Accounts will be loaded here -->
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Settings Section -->
+                 <div class="content-section" id="settings-section" style="display: none;">
+                     <div class="content-header">
+                         <div class="content-title">
+                             <i class="fas fa-cog"></i>
+                             Cài đặt hệ thống
+                         </div>
+                         <div class="content-subtitle">
+                             Cấu hình và bảo mật hệ thống
+                         </div>
+                     </div>
+                     
+                     <div class="content-body">
+                         <div class="api-config-card">
+                             <div class="card-header">
+                                 <h3><i class="fas fa-shield-alt"></i> Bảo mật hệ thống</h3>
+                             </div>
+                             
+                             <div class="api-form">
+                                 <div class="form-group">
+                                     <label>Trạng thái hệ thống:</label>
+                                     <div class="connection-status">
+                                         <div class="status-item">
+                                             <i class="fas fa-check-circle"></i>
+                                             <span>Hệ thống hoạt động bình thường</span>
+                                         </div>
+                                         <div class="status-item">
+                                             <i class="fas fa-check-circle"></i>
+                                             <span>Bảo mật đã được kích hoạt</span>
+                                         </div>
+                                         <div class="status-item">
+                                             <i class="fas fa-info-circle"></i>
+                                             <span>Phiên bản: 1.0.0</span>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </main>
+     </div>
+
+    <script src="file-processor.js"></script>
+    <script>
+        // File Upload System
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const uploadProgress = document.getElementById('upload-progress');
+        const fileProcessing = document.getElementById('file-processing');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+
+        let uploadQueue = [];
+        let isUploading = false;
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            if (files.length === 0) return;
+
+            // Thêm files vào queue
+            for (let file of files) {
+                if (validateFile(file)) {
+                    uploadQueue.push(file);
+                }
+            }
+
+            // Bắt đầu upload nếu chưa đang upload
+            if (!isUploading) {
+                processUploadQueue();
+            }
+        }
+
+        function validateFile(file) {
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+            const maxSize = 10 * 1024 * 1024; // 10MB
+
+            if (!allowedTypes.includes(file.type)) {
+                alert(`File "${file.name}" không được hỗ trợ. Chỉ chấp nhận PDF, DOC, DOCX, TXT`);
+                return false;
+            }
+
+            if (file.size > maxSize) {
+                alert(`File "${file.name}" quá lớn. Kích thước tối đa: 10MB`);
+                return false;
+            }
+
+            return true;
+        }
+
+        async function processUploadQueue() {
+            if (uploadQueue.length === 0) {
+                isUploading = false;
+                hideUploadProgress();
+                return;
+            }
+
+            isUploading = true;
+            const file = uploadQueue.shift();
+            
+            showUploadProgress();
+            await uploadFile(file);
+            
+            // Xử lý file tiếp theo
+            setTimeout(() => {
+                processUploadQueue();
+            }, 500);
+        }
+
+        async function uploadFile(file) {
+            try {
+                // Hiển thị progress
+                updateProgress(0, `Đang upload ${file.name}...`);
+                
+                // Simulate upload progress
+                for (let i = 0; i <= 100; i += 10) {
+                    updateProgress(i, `Đang upload ${file.name}... ${i}%`);
+                    await sleep(100);
+                }
+
+                // Chuyển sang processing
+                showFileProcessing();
+                updateProcessingStep(1, 'completed');
+                updateProcessingStep(2, 'active');
+                
+                // Process file with real FileProcessor
+                const processor = new FileProcessor();
+                const result = await processor.processFile(file);
+                
+                if (!result.success) {
+                    throw new Error(result.error);
+                }
+                
+                updateProcessingStep(2, 'completed');
+                updateProcessingStep(3, 'active');
+                
+                // Simulate database save
+                await sleep(1000);
+                updateProcessingStep(3, 'completed');
+
+                // Lưu file vào localStorage
+                saveFileToStorage(result.data);
+                
+                // Cập nhật file list
+                updateFileList();
+                
+                // Ẩn processing
+                hideFileProcessing();
+                
+                console.log(`File "${file.name}" đã được upload thành công!`);
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert(`Lỗi upload file "${file.name}": ${error.message}`);
+                hideFileProcessing();
+            }
+        }
+
+        function saveFileToStorage(fileData) {
+            const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+            files.push(fileData);
+            localStorage.setItem('uploadedFiles', JSON.stringify(files));
+        }
+
+        function detectSubjectFromFileName(fileName) {
+            const lowerName = fileName.toLowerCase();
+            
+            if (lowerName.includes('toán') || lowerName.includes('math')) return 'toanHoc';
+            if (lowerName.includes('văn') || lowerName.includes('van')) return 'vanHoc';
+            if (lowerName.includes('anh') || lowerName.includes('english')) return 'tiengAnh';
+            if (lowerName.includes('lý') || lowerName.includes('physics')) return 'vatLy';
+            
+            return 'toanHoc'; // Default
+        }
+
+        function generateMockContent(fileName) {
+            const subjects = {
+                'toanHoc': 'Đề thi Toán cao cấp với các câu hỏi về đại số, giải tích, hình học...',
+                'vanHoc': 'Đề thi Văn học đại cương với các câu hỏi về văn học Việt Nam...',
+                'tiengAnh': 'Đề thi Tiếng Anh đại học với các câu hỏi về ngữ pháp, từ vựng...',
+                'vatLy': 'Đề thi Vật lý đại cương với các câu hỏi về cơ học, điện học...'
+            };
+            
+            const subject = detectSubjectFromFileName(fileName);
+            return subjects[subject] || subjects['toanHoc'];
+        }
+
+        function updateFileList() {
+            const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+            const fileList = document.querySelector('.file-list');
+            
+            if (!fileList) return;
+            
+            let html = `
+                <div class="file-list-header">
+                    <h3 class="file-list-title">Đề thi đã upload</h3>
+                    <span>${files.length} files</span>
+                </div>
+            `;
+            
+            files.forEach(file => {
+                const fileSize = formatFileSize(file.size);
+                const uploadDate = formatDate(file.uploadDate);
+                const subjectName = getSubjectName(file.subject);
+                
+                html += `
+                    <div class="file-item">
+                        <div class="file-status ${file.status}">${file.status}</div>
+                        <div class="file-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="file-info">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-meta">
+                                <span>${fileSize}</span>
+                                <span>Upload: ${uploadDate}</span>
+                                <span>${subjectName}</span>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="previewFile('${file.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="editFile('${file.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteFile('${file.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            fileList.innerHTML = html;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) return 'Hôm nay';
+            if (diffDays === 2) return 'Hôm qua';
+            if (diffDays <= 7) return `${diffDays - 1} ngày trước`;
+            if (diffDays <= 30) return `${Math.floor(diffDays / 7)} tuần trước`;
+            return date.toLocaleDateString('vi-VN');
+        }
+
+        function getSubjectName(subject) {
+            const subjects = {
+                'toanHoc': 'Toán cao cấp',
+                'vanHoc': 'Văn học đại cương',
+                'tiengAnh': 'Tiếng Anh đại học',
+                'vatLy': 'Vật lý đại cương'
+            };
+            return subjects[subject] || 'Khác';
+        }
+
+        function showUploadProgress() {
+            uploadProgress.style.display = 'block';
+            uploadArea.style.display = 'none';
+        }
+
+        function hideUploadProgress() {
+            uploadProgress.style.display = 'none';
+            uploadArea.style.display = 'block';
+        }
+
+        function showFileProcessing() {
+            fileProcessing.style.display = 'block';
+            uploadProgress.style.display = 'none';
+        }
+
+        function hideFileProcessing() {
+            fileProcessing.style.display = 'none';
+            uploadArea.style.display = 'block';
+        }
+
+        function updateProgress(percent, text) {
+            progressFill.style.width = percent + '%';
+            progressText.textContent = text;
+        }
+
+        function updateProcessingStep(step, status) {
+            const stepElement = document.getElementById(`step-${step}`);
+            if (stepElement) {
+                stepElement.className = `step ${status}`;
+            }
+        }
+
+        function cancelUpload() {
+            uploadQueue = [];
+            isUploading = false;
+            hideUploadProgress();
+            hideFileProcessing();
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // File management functions
+        function previewFile(fileId) {
+            const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+            const file = files.find(f => f.id == fileId);
+            
+            if (file) {
+                alert(`Xem trước file: ${file.name}\n\nNội dung: ${file.content}`);
+            }
+        }
+
+        function editFile(fileId) {
+            const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+            const file = files.find(f => f.id == fileId);
+            
+            if (file) {
+                const newSubject = prompt('Chọn môn học:', file.subject);
+                if (newSubject && ['toanHoc', 'vanHoc', 'tiengAnh', 'vatLy'].includes(newSubject)) {
+                    file.subject = newSubject;
+                    localStorage.setItem('uploadedFiles', JSON.stringify(files));
+                    updateFileList();
+                    alert('Đã cập nhật môn học!');
+                }
+            }
+        }
+
+        function deleteFile(fileId) {
+            if (confirm('Bạn có chắc muốn xóa file này?')) {
+                const files = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
+                const updatedFiles = files.filter(f => f.id != fileId);
+                localStorage.setItem('uploadedFiles', JSON.stringify(updatedFiles));
+                updateFileList();
+                alert('Đã xóa file!');
+            }
+        }
+
+
+
+        // File actions
+        document.querySelectorAll('.action-button.edit').forEach(button => {
+            button.addEventListener('click', function() {
+                alert('Chức năng sửa file sẽ được thêm sau!');
+            });
+        });
+
+        document.querySelectorAll('.action-button.delete').forEach(button => {
+            button.addEventListener('click', function() {
+                if (confirm('Bạn có chắc muốn xóa file này?')) {
+                    alert('File đã được xóa!');
+                }
+            });
+        });
+
+                 // API Management Functions
+         let activeProvider = 'gemini';
+
+         function toggleApiKeyVisibility(inputId) {
+             const input = document.getElementById(inputId);
+             const button = event.target.closest('button');
+             const icon = button.querySelector('i');
+             
+             if (input.type === 'password') {
+                 input.type = 'text';
+                 icon.className = 'fas fa-eye-slash';
+             } else {
+                 input.type = 'password';
+                 icon.className = 'fas fa-eye';
+             }
+         }
+
+         function toggleProvider(provider, enabled) {
+             // Cập nhật trạng thái provider
+             const providerItem = document.querySelector(`[data-provider="${provider}"]`);
+             const statusElement = providerItem.querySelector('.provider-status');
+             
+             if (enabled) {
+                 // Tắt provider khác nếu đang bật
+                 document.querySelectorAll('.provider-item').forEach(item => {
+                     if (item.dataset.provider !== provider) {
+                         const checkbox = item.querySelector('input[type="checkbox"]');
+                         checkbox.checked = false;
+                         item.classList.remove('active');
+                         
+                         const otherStatus = item.querySelector('.provider-status');
+                         otherStatus.className = 'provider-status disconnected';
+                         otherStatus.innerHTML = '<i class="fas fa-circle"></i><span>Chưa cấu hình</span>';
+                     }
+                 });
+                 
+                 // Bật provider hiện tại
+                 providerItem.classList.add('active');
+                 statusElement.className = 'provider-status connected';
+                 statusElement.innerHTML = '<i class="fas fa-circle"></i><span>Đang hoạt động</span>';
+                 activeProvider = provider;
+                 
+                 // Hiển thị config tương ứng
+                 showProviderConfig(provider);
+             } else {
+                 providerItem.classList.remove('active');
+                 statusElement.className = 'provider-status disconnected';
+                 statusElement.innerHTML = '<i class="fas fa-circle"></i><span>Chưa cấu hình</span>';
+             }
+             
+             // Cập nhật status badge
+             updateStatusBadge();
+         }
+
+         function showProviderConfig(provider) {
+             // Ẩn tất cả config
+             document.querySelectorAll('.api-provider-config').forEach(config => {
+                 config.style.display = 'none';
+             });
+             
+             // Hiển thị config của provider được chọn
+             const configElement = document.getElementById(`${provider}-config`);
+             if (configElement) {
+                 configElement.style.display = 'block';
+             }
+             
+             // Cập nhật status
+             document.querySelectorAll('.config-status').forEach(status => {
+                 status.className = 'config-status inactive';
+                 status.textContent = 'Chưa sử dụng';
+             });
+             
+             const activeStatus = configElement.querySelector('.config-status');
+             if (activeStatus) {
+                 activeStatus.className = 'config-status active';
+                 activeStatus.textContent = 'Đang sử dụng';
+             }
+         }
+
+         function updateStatusBadge() {
+             const statusBadge = document.querySelector('.api-status-badge');
+             const providerNames = {
+                 'gemini': 'Gemini',
+                 'openai': 'OpenAI',
+                 'claude': 'Claude',
+                 'local': 'Local AI'
+             };
+             
+             if (statusBadge) {
+                 statusBadge.innerHTML = `<i class="fas fa-circle"></i><span>${providerNames[activeProvider]} đang hoạt động</span>`;
+             }
+         }
+
+         function saveApiConfig(provider) {
+             let apiKey, model;
+             
+             switch(provider) {
+                 case 'gemini':
+                     apiKey = document.getElementById('geminiApiKey').value.trim();
+                     model = document.getElementById('geminiModel').value;
+                     break;
+                 case 'openai':
+                     apiKey = document.getElementById('openaiApiKey').value.trim();
+                     model = document.getElementById('openaiModel').value;
+                     break;
+                 case 'claude':
+                     apiKey = document.getElementById('claudeApiKey').value.trim();
+                     model = document.getElementById('claudeModel').value;
+                     break;
+                 case 'local':
+                     apiKey = document.getElementById('localServerUrl').value.trim();
+                     model = document.getElementById('localModel').value;
+                     break;
+             }
+             
+             if (!apiKey) {
+                 alert(`Vui lòng nhập thông tin cho ${provider}!`);
+                 return;
+             }
+             
+             // Lưu config vào localStorage
+             const config = {
+                 apiKey: apiKey,
+                 model: model,
+                 provider: provider,
+                 timestamp: new Date().toISOString()
+             };
+             
+             localStorage.setItem(`${provider}_config`, JSON.stringify(config));
+             
+             // Lưu API key riêng biệt để user interface có thể đọc
+             if (provider === 'gemini') {
+                 localStorage.setItem('gemini-key-0', apiKey);
+                 
+                 // Trigger storage event để user interface cập nhật
+                 window.dispatchEvent(new StorageEvent('storage', {
+                     key: 'gemini_config',
+                     newValue: JSON.stringify(config)
+                 }));
+             }
+             
+             alert(`Cấu hình ${provider} đã được lưu thành công!`);
+         }
+
+         function testApiConnection(provider) {
+             const config = JSON.parse(localStorage.getItem(`${provider}_config`) || '{}');
+             
+             if (!config.apiKey) {
+                 alert(`Vui lòng lưu cấu hình ${provider} trước khi test!`);
+                 return;
+             }
+             
+             // Hiển thị loading
+             const button = event.target.closest('button');
+             const originalText = button.innerHTML;
+             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang test...';
+             button.disabled = true;
+             
+             // Test API (giả lập)
+             setTimeout(() => {
+                 button.innerHTML = originalText;
+                 button.disabled = false;
+                 
+                 // Cập nhật status
+                 const providerItem = document.querySelector(`[data-provider="${provider}"]`);
+                 const statusElement = providerItem.querySelector('.provider-status');
+                 statusElement.className = 'provider-status connected';
+                 statusElement.innerHTML = '<i class="fas fa-circle"></i><span>Kết nối thành công</span>';
+                 
+                 alert(`Kết nối ${provider} thành công!`);
+             }, 2000);
+         }
+
+         // API Keys Management Functions
+         function addApiKey(provider) {
+             const container = document.getElementById(`${provider}-keys-container`);
+             const keyCount = container.children.length;
+             const newKeyIndex = keyCount;
+             
+             const newKeyItem = document.createElement('div');
+             newKeyItem.className = 'api-key-item';
+             newKeyItem.dataset.keyIndex = newKeyIndex;
+             
+             newKeyItem.innerHTML = `
+                 <div class="key-header">
+                     <div class="key-info">
+                         <span class="key-name">API Key #${newKeyIndex + 1}</span>
+                         <span class="key-status disconnected">
+                             <i class="fas fa-circle"></i>
+                             Chưa test
+                         </span>
+                     </div>
+                     <div class="key-actions">
+                         <button class="btn btn-sm btn-secondary" onclick="toggleApiKeyVisibility('${provider}-key-${newKeyIndex}')">
+                             <i class="fas fa-eye"></i>
+                         </button>
+                         <button class="btn btn-sm btn-warning" onclick="removeApiKey('${provider}', ${newKeyIndex})">
+                             <i class="fas fa-trash"></i>
+                         </button>
+                     </div>
+                 </div>
+                 <div class="key-input-group">
+                     <input type="password" id="${provider}-key-${newKeyIndex}" class="form-input" 
+                            placeholder="Nhập ${provider} API key...">
+                 </div>
+                 <div class="key-metrics">
+                     <div class="metric">
+                         <span class="metric-label">Requests:</span>
+                         <span class="metric-value">0</span>
+                     </div>
+                     <div class="metric">
+                         <span class="metric-label">Limit:</span>
+                         <span class="metric-value">15/min</span>
+                     </div>
+                     <div class="metric">
+                         <span class="metric-label">Status:</span>
+                         <span class="metric-value">-</span>
+                     </div>
+                 </div>
+             `;
+             
+             container.appendChild(newKeyItem);
+             
+             // Cập nhật tên các key
+             updateKeyNames(provider);
+             
+             // Thêm event listener để auto-save khi user nhập key
+             const input = newKeyItem.querySelector('input');
+             input.addEventListener('blur', function() {
+                 if (this.value.trim()) {
+                     localStorage.setItem(`${provider}-key-${newKeyIndex}`, this.value.trim());
+                     
+                     // Trigger storage event để user interface cập nhật
+                     window.dispatchEvent(new StorageEvent('storage', {
+                         key: `${provider}-key-${newKeyIndex}`,
+                         newValue: this.value.trim()
+                     }));
+                 }
+             });
+         }
+
+         function removeApiKey(provider, keyIndex) {
+             if (confirm('Bạn có chắc muốn xóa API key này?')) {
+                 const container = document.getElementById(`${provider}-keys-container`);
+                 const keyItem = container.querySelector(`[data-key-index="${keyIndex}"]`);
+                 
+                 if (keyItem) {
+                     keyItem.remove();
+                     updateKeyNames(provider);
+                     
+                     // Nếu xóa key đang active, chuyển sang key khác
+                     if (keyItem.classList.contains('active')) {
+                         const firstKey = container.querySelector('.api-key-item');
+                         if (firstKey) {
+                             firstKey.classList.add('active');
+                             const status = firstKey.querySelector('.key-status');
+                             status.className = 'key-status connected';
+                             status.innerHTML = '<i class="fas fa-circle"></i><span>Đang hoạt động</span>';
+                         }
+                     }
+                 }
+             }
+         }
+
+         function updateKeyNames(provider) {
+             const container = document.getElementById(`${provider}-keys-container`);
+             const keyItems = container.querySelectorAll('.api-key-item');
+             
+             keyItems.forEach((item, index) => {
+                 const keyName = item.querySelector('.key-name');
+                 const isFirst = index === 0;
+                 keyName.textContent = `API Key #${index + 1}${isFirst ? ' (Chính)' : ''}`;
+                 item.dataset.keyIndex = index;
+                 
+                 // Cập nhật ID của input
+                 const input = item.querySelector('input');
+                 input.id = `${provider}-key-${index}`;
+                 
+                 // Cập nhật onclick handlers
+                 const eyeBtn = item.querySelector('.btn-secondary');
+                 const trashBtn = item.querySelector('.btn-warning');
+                 
+                 eyeBtn.onclick = () => toggleApiKeyVisibility(`${provider}-key-${index}`);
+                 trashBtn.onclick = () => removeApiKey(provider, index);
+             });
+         }
+
+         function testAllApiKeys(provider) {
+             const container = document.getElementById(`${provider}-keys-container`);
+             const keyItems = container.querySelectorAll('.api-key-item');
+             
+             if (keyItems.length === 0) {
+                 alert('Không có API key nào để test!');
+                 return;
+             }
+             
+             const button = event.target.closest('button');
+             const originalText = button.innerHTML;
+             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang test...';
+             button.disabled = true;
+             
+             let testedCount = 0;
+             let successCount = 0;
+             
+             keyItems.forEach((item, index) => {
+                 const input = item.querySelector('input');
+                 const status = item.querySelector('.key-status');
+                 const metricValue = item.querySelector('.metric-value:last-child');
+                 
+                 if (input.value.trim()) {
+                     testedCount++;
+                     
+                     // Simulate API test
+                     setTimeout(() => {
+                         const isSuccess = Math.random() > 0.3; // 70% success rate
+                         
+                         if (isSuccess) {
+                             successCount++;
+                             status.className = 'key-status connected';
+                             status.innerHTML = '<i class="fas fa-circle"></i><span>Kết nối thành công</span>';
+                             metricValue.textContent = 'OK';
+                             metricValue.className = 'metric-value success';
+                             
+                             // Set as active if it's the first successful key
+                             if (successCount === 1) {
+                                 item.classList.add('active');
+                             }
+                         } else {
+                             status.className = 'key-status disconnected';
+                             status.innerHTML = '<i class="fas fa-circle"></i><span>Kết nối thất bại</span>';
+                             metricValue.textContent = 'ERROR';
+                             metricValue.className = 'metric-value error';
+                         }
+                         
+                         // Update button when all tests are done
+                         if (testedCount === keyItems.length) {
+                             button.innerHTML = originalText;
+                             button.disabled = false;
+                             alert(`Test hoàn thành: ${successCount}/${testedCount} keys thành công!`);
+                         }
+                     }, 1000 + index * 500); // Stagger tests
+                 }
+             });
+             
+             if (testedCount === 0) {
+                 button.innerHTML = originalText;
+                 button.disabled = false;
+                 alert('Không có API key nào để test!');
+             }
+         }
+
+         function showApiKeyStats(provider) {
+             const container = document.getElementById(`${provider}-keys-container`);
+             const keyItems = container.querySelectorAll('.api-key-item');
+             
+             let stats = {
+                 total: keyItems.length,
+                 active: 0,
+                 connected: 0,
+                 disconnected: 0,
+                 totalRequests: 0
+             };
+             
+             keyItems.forEach(item => {
+                 if (item.classList.contains('active')) stats.active++;
+                 
+                 const status = item.querySelector('.key-status');
+                 if (status.classList.contains('connected')) stats.connected++;
+                 else if (status.classList.contains('disconnected')) stats.disconnected++;
+                 
+                 const requestsMetric = item.querySelector('.metric-value');
+                 const requests = parseInt(requestsMetric.textContent.replace(',', '')) || 0;
+                 stats.totalRequests += requests;
+             });
+             
+             const message = `
+                 📊 Thống kê ${provider.toUpperCase()}:
+                 
+                 🔑 Tổng số keys: ${stats.total}
+                 ✅ Đang hoạt động: ${stats.active}
+                 🟢 Kết nối thành công: ${stats.connected}
+                 🔴 Kết nối thất bại: ${stats.disconnected}
+                 📈 Tổng requests: ${stats.totalRequests.toLocaleString()}
+                 
+                 💡 Gợi ý: ${stats.connected > 1 ? 'Hệ thống có thể chuyển đổi key khi cần!' : 'Nên thêm key dự phòng!'}
+             `;
+             
+             alert(message);
+         }
+
+         // Subject Sharing Functions
+         function toggleSubjectShare(subject, enabled) {
+             const subjectItem = document.querySelector(`[data-subject="${subject}"]`);
+             const statusElement = subjectItem.querySelector('.provider-status');
+             
+             if (enabled) {
+                 statusElement.className = 'provider-status connected';
+                 statusElement.innerHTML = '<i class="fas fa-circle"></i><span>Đang hoạt động</span>';
+                 
+                 // Lưu trạng thái vào localStorage
+                 localStorage.setItem(`subject_${subject}_enabled`, 'true');
+                 
+                 // Tạo hoặc cập nhật shared link
+                 createOrUpdateSharedLink(subject);
+             } else {
+                 statusElement.className = 'provider-status disconnected';
+                 statusElement.innerHTML = '<i class="fas fa-circle"></i><span>Đã tắt</span>';
+                 
+                 // Lưu trạng thái vào localStorage
+                 localStorage.setItem(`subject_${subject}_enabled`, 'false');
+                 
+                 // Tắt shared link
+                 disableSharedLink(subject);
+             }
+             
+             // Cập nhật hiển thị link chia sẻ
+             updateShareLinkDisplay(subject, enabled);
+             loadSharedLinks();
+         }
+
+         function createOrUpdateSharedLink(subject) {
+             const sharedSubjects = JSON.parse(localStorage.getItem('sharedSubjects') || '{}');
+             
+             if (!sharedSubjects[subject] || !sharedSubjects[subject].token) {
+                 // Tạo token mới
+                 const token = generateToken();
+                 sharedSubjects[subject] = {
+                     token: token,
+                     enabled: true,
+                     createdAt: new Date().toISOString(),
+                     lastUpdated: new Date().toISOString()
+                 };
+             } else {
+                 // Cập nhật trạng thái
+                 sharedSubjects[subject].enabled = true;
+                 sharedSubjects[subject].lastUpdated = new Date().toISOString();
+             }
+             
+             localStorage.setItem('sharedSubjects', JSON.stringify(sharedSubjects));
+         }
+
+         function disableSharedLink(subject) {
+             const sharedSubjects = JSON.parse(localStorage.getItem('sharedSubjects') || '{}');
+             
+             if (sharedSubjects[subject]) {
+                 sharedSubjects[subject].enabled = false;
+                 sharedSubjects[subject].lastUpdated = new Date().toISOString();
+                 localStorage.setItem('sharedSubjects', JSON.stringify(sharedSubjects));
+             }
+         }
+
+         function generateToken() {
+             return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+         }
+
+         function regenerateToken(subject) {
+             const sharedSubjects = JSON.parse(localStorage.getItem('sharedSubjects') || '{}');
+             
+             if (sharedSubjects[subject]) {
+                 const newToken = generateToken();
+                 sharedSubjects[subject].token = newToken;
+                 sharedSubjects[subject].lastUpdated = new Date().toISOString();
+                 localStorage.setItem('sharedSubjects', JSON.stringify(sharedSubjects));
+                 
+                 loadSharedLinks();
+                 alert('Đã tạo token mới cho ' + subject);
+             }
+         }
+
+         function loadSharedLinks() {
+             const container = document.getElementById('shared-links-container');
+             if (!container) return;
+             
+             const sharedSubjects = JSON.parse(localStorage.getItem('sharedSubjects') || '{}');
+             const subjectNames = {
+                 'toanHoc': 'Toán cao cấp',
+                 'vanHoc': 'Văn học đại cương',
+                 'tiengAnh': 'Tiếng Anh đại học',
+                 'vatLy': 'Vật lý đại cương'
+             };
+             
+             let html = '';
+             
+             Object.keys(subjectNames).forEach(subject => {
+                 const subjectData = sharedSubjects[subject];
+                 const isEnabled = subjectData && subjectData.enabled;
+                 const statusText = isEnabled ? 'Đang hoạt động' : 'Đã tắt';
+                 const statusColor = isEnabled ? 'var(--secondary-color)' : 'var(--text-secondary)';
+                 
+                 html += `
+                     <div class="share-link-item">
+                         <div class="share-link-info">
+                             <span class="share-link-name">${subjectNames[subject]}</span>
+                             <span class="share-link-url" style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
+                             ${subjectData && subjectData.token ? 
+                                 `<span class="share-link-url" style="font-size: 0.7rem; margin-top: 0.25rem;">Token: ${subjectData.token.substring(0, 8)}...</span>` : 
+                                 ''
+                             }
+                         </div>
+                         <div class="share-link-actions">
+                             <button class="btn btn-sm btn-secondary" onclick="copyShareLink('${subject}')">
+                                 <i class="fas fa-copy"></i>
+                                 Copy
+                             </button>
+                             <button class="btn btn-sm btn-primary" onclick="previewShareLink('${subject}')">
+                                 <i class="fas fa-eye"></i>
+                                 Xem trước
+                             </button>
+                             ${subjectData && subjectData.token ? 
+                                 `<button class="btn btn-sm btn-warning" onclick="regenerateToken('${subject}')">
+                                     <i class="fas fa-refresh"></i>
+                                     Đổi token
+                                 </button>` : 
+                                 ''
+                             }
+                         </div>
+                     </div>
+                 `;
+             });
+             
+             container.innerHTML = html;
+         }
+
+         function copyShareLink(subject) {
+             let url;
+             if (subject === 'vip') {
+                 url = window.location.origin + '/index.html?vip=true';
+             } else {
+                 // Kiểm tra xem có phải shared link không
+                 const sharedSubjects = JSON.parse(localStorage.getItem('sharedSubjects') || '{}');
+                 const subjectData = sharedSubjects[subject];
+                 
+                 if (subjectData && subjectData.enabled) {
+                     url = window.location.origin + '/index.html?share=' + subject + '&token=' + subjectData.token;
+                 } else {
+                     url = window.location.origin + '/index.html?subject=' + subject;
+                 }
+             }
+             
+             navigator.clipboard.writeText(url).then(() => {
+                 alert('Đã copy link vào clipboard!');
+             }).catch(() => {
+                 // Fallback cho trình duyệt cũ
+                 const textArea = document.createElement('textarea');
+                 textArea.value = url;
+                 document.body.appendChild(textArea);
+                 textArea.select();
+                 document.execCommand('copy');
+                 document.body.removeChild(textArea);
+                 alert('Đã copy link vào clipboard!');
+             });
+         }
+
+         function previewShareLink(subject) {
+             let url;
+             if (subject === 'vip') {
+                 url = 'index.html?vip=true';
+             } else {
+                 // Kiểm tra xem có phải shared link không
+                 const sharedSubjects = JSON.parse(localStorage.getItem('sharedSubjects') || '{}');
+                 const subjectData = sharedSubjects[subject];
+                 
+                 if (subjectData && subjectData.enabled) {
+                     url = 'index.html?share=' + subject + '&token=' + subjectData.token;
+                 } else {
+                     url = 'index.html?subject=' + subject;
+                 }
+             }
+             
+             // Mở trong tab mới
+             window.open(url, '_blank');
+         }
+
+         function updateShareLinkDisplay(subject, enabled) {
+             const shareLinkItem = document.querySelector(`[data-subject="${subject}"]`);
+             if (shareLinkItem) {
+                 if (enabled) {
+                     shareLinkItem.style.opacity = '1';
+                 } else {
+                     shareLinkItem.style.opacity = '0.5';
+                 }
+             }
+         }
+
+                 // Kiểm tra quyền admin
+        function checkAdminAccess() {
+            const loginData = localStorage.getItem('loginData');
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            
+            if (!loginData || !isLoggedIn) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            const userData = JSON.parse(loginData);
+            if (userData.role !== 'admin') {
+                alert('Bạn không có quyền truy cập trang Admin!');
+                window.location.href = 'index.html';
+                return false;
+            }
+            
+            // Hiển thị tên admin
+            const adminNameElement = document.getElementById('admin-name');
+            if (adminNameElement) {
+                adminNameElement.textContent = userData.name;
+            }
+            
+            return true;
+        }
+
+        // Hàm đăng xuất
+        function logout() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                localStorage.removeItem('loginData');
+                sessionStorage.removeItem('isLoggedIn');
+                window.location.href = 'login.html';
+            }
+        }
+
+                 // Account Management Functions
+         function createAccount() {
+             const username = document.getElementById('newUsername').value.trim();
+             const password = document.getElementById('newPassword').value.trim();
+             const role = document.getElementById('newRole').value;
+             const subject = document.getElementById('newSubject').value;
+             
+             if (!username || !password) {
+                 alert('Vui lòng nhập đầy đủ thông tin!');
+                 return;
+             }
+             
+             // Lấy danh sách tài khoản hiện tại
+             const accounts = JSON.parse(localStorage.getItem('userAccounts') || '{}');
+             
+             if (accounts[username]) {
+                 alert('Tên đăng nhập đã tồn tại!');
+                 return;
+             }
+             
+             // Tạo tài khoản mới
+             const newAccount = {
+                 password: password,
+                 role: role,
+                 name: username,
+                 permissions: role === 'vip' ? ['all_subjects'] : 
+                             role === 'subject' ? [subject] : ['limited'],
+                 subject: role === 'subject' ? subject : null,
+                 createdAt: new Date().toISOString()
+             };
+             
+             accounts[username] = newAccount;
+             localStorage.setItem('userAccounts', JSON.stringify(accounts));
+             
+             alert('Tạo tài khoản thành công!');
+             
+             // Reset form
+             document.getElementById('newUsername').value = '';
+             document.getElementById('newPassword').value = '';
+             document.getElementById('newRole').value = 'user';
+             document.getElementById('subjectSelectGroup').style.display = 'none';
+             
+             // Reload account list
+             loadAccountsList();
+         }
+
+         function loadAccountsList() {
+             const accounts = JSON.parse(localStorage.getItem('userAccounts') || '{}');
+             const accountsList = document.getElementById('accountsList');
+             
+             if (!accountsList) return;
+             
+             let html = '';
+             
+             Object.keys(accounts).forEach(username => {
+                 const account = accounts[username];
+                 const roleText = account.role === 'vip' ? 'VIP' : 
+                                 account.role === 'subject' ? `Môn: ${account.subject}` : 'Thường';
+                 const roleColor = account.role === 'vip' ? 'var(--warning-color)' : 
+                                  account.role === 'subject' ? 'var(--primary-color)' : 'var(--text-secondary)';
+                 
+                 html += `
+                     <div class="share-link-item">
+                         <div class="share-link-info">
+                             <span class="share-link-name">${username}</span>
+                             <span class="share-link-url" style="color: ${roleColor}; font-weight: 600;">${roleText}</span>
+                         </div>
+                         <div class="share-link-actions">
+                             <button class="btn btn-sm btn-warning" onclick="deleteAccount('${username}')">
+                                 <i class="fas fa-trash"></i>
+                                 Xóa
+                             </button>
+                         </div>
+                     </div>
+                 `;
+             });
+             
+             if (Object.keys(accounts).length === 0) {
+                 html = '<p style="text-align: center; color: var(--text-secondary);">Chưa có tài khoản nào</p>';
+             }
+             
+             accountsList.innerHTML = html;
+         }
+
+         function deleteAccount(username) {
+             if (confirm(`Bạn có chắc muốn xóa tài khoản "${username}"?`)) {
+                 const accounts = JSON.parse(localStorage.getItem('userAccounts') || '{}');
+                 delete accounts[username];
+                 localStorage.setItem('userAccounts', JSON.stringify(accounts));
+                 loadAccountsList();
+                 alert('Đã xóa tài khoản!');
+             }
+         }
+
+         // Show/hide subject select based on role
+         document.addEventListener('change', function(e) {
+             if (e.target.id === 'newRole') {
+                 const subjectGroup = document.getElementById('subjectSelectGroup');
+                 if (e.target.value === 'subject') {
+                     subjectGroup.style.display = 'block';
+                 } else {
+                     subjectGroup.style.display = 'none';
+                 }
+             }
+         });
+
+         // Load saved configs khi trang load
+         document.addEventListener('DOMContentLoaded', function() {
+            // Kiểm tra quyền admin trước
+            if (!checkAdminAccess()) {
+                return;
+            }
+            
+             // Load Gemini config mặc định
+             const geminiConfig = JSON.parse(localStorage.getItem('gemini_config') || '{}');
+             if (geminiConfig.apiKey) {
+                 document.getElementById('gemini-key-0').value = geminiConfig.apiKey;
+                 if (geminiConfig.model) {
+                     document.getElementById('geminiModel').value = geminiConfig.model;
+                 }
+             }
+             
+             // Load các config khác nếu có
+             ['openai', 'claude', 'local'].forEach(provider => {
+                 const config = JSON.parse(localStorage.getItem(`${provider}_config`) || '{}');
+                 if (config.apiKey) {
+                     const inputId = provider === 'local' ? 'localServerUrl' : `${provider}ApiKey`;
+                     const modelId = `${provider}Model`;
+                     
+                     if (document.getElementById(inputId)) {
+                         document.getElementById(inputId).value = config.apiKey;
+                     }
+                     if (config.model && document.getElementById(modelId)) {
+                         document.getElementById(modelId).value = config.model;
+                     }
+                 }
+             });
+            
+                         // Load trạng thái chia sẻ môn học
+             ['toanHoc', 'vanHoc', 'tiengAnh', 'vatLy'].forEach(subject => {
+                 const enabled = localStorage.getItem(`subject_${subject}_enabled`) !== 'false';
+                 const checkbox = document.querySelector(`[data-subject="${subject}"] input[type="checkbox"]`);
+                 if (checkbox) {
+                     checkbox.checked = enabled;
+                     toggleSubjectShare(subject, enabled);
+                 }
+             });
+             
+             // Load danh sách tài khoản
+             loadAccountsList();
+             
+             // Load shared links
+             loadSharedLinks();
+             
+             // Load file list
+             updateFileList();
+         });
+
+        // Menu navigation with content switching
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                document.querySelectorAll('.menu-item').forEach(i => 
+                    i.classList.remove('active')
+                );
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Hide all content sections
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // Hide default upload section
+                const uploadArea = document.getElementById('upload-area');
+                const fileList = document.querySelector('.file-list');
+                if (uploadArea) uploadArea.style.display = 'none';
+                if (fileList) fileList.style.display = 'none';
+                
+                // Show selected section
+                const section = this.dataset.section;
+                const targetSection = document.getElementById(section + '-section');
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                } else if (section === 'upload') {
+                    // Show default upload section
+                    if (uploadArea) uploadArea.style.display = 'block';
+                    if (fileList) fileList.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

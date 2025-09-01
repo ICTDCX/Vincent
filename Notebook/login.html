@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Vincent E Neu</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --warning-color: #fbbc04;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --border-color: #dadce0;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+        }
+
+        .login-container {
+            background: var(--bg-primary);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 90%;
+            max-width: 400px;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .brand-info h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-info p {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .login-form {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .login-button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(66, 133, 244, 0.3);
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .quick-access {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .access-button {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .access-button:hover {
+            border-color: var(--primary-color);
+            background: rgba(66, 133, 244, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .access-button i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .error-message {
+            background: rgba(234, 67, 53, 0.1);
+            color: var(--accent-color);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(52, 168, 83, 0.1);
+            color: var(--secondary-color);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1rem 2rem;
+            background: var(--bg-secondary);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="z6931423474483_5a32b03c376620b1a7e8e5b47f902cec.jpg" alt="Vincent E Neu">
+                </div>
+                <div class="brand-info">
+                    <h1>Vincent E Neu</h1>
+                    <p>Hệ thống Đăng nhập</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-form">
+            <div class="error-message" id="error-message"></div>
+            <div class="success-message" id="success-message"></div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập</label>
+                    <div class="input-group">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" id="username" class="form-input" placeholder="Nhập tên đăng nhập" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="password" class="form-input" placeholder="Nhập mật khẩu" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-button" id="login-button">
+                    <span id="login-text">Đăng nhập</span>
+                    <span id="login-loading" class="loading" style="display: none;"></span>
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>hoặc</span>
+            </div>
+
+            <div class="quick-access">
+                <a href="index.html" class="access-button">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Người dùng</span>
+                </a>
+                <a href="admin.html" class="access-button">
+                    <i class="fas fa-cog"></i>
+                    <span>Admin</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Liên hệ hỗ trợ: <a href="https://zalo.me/84943222362" target="_blank">zalo.me/84943222362</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Tài khoản mẫu
+        const accounts = {
+            'admin': {
+                password: 'admin123',
+                role: 'admin',
+                name: 'Administrator',
+                permissions: ['all']
+            },
+            'vip': {
+                password: 'vip123',
+                role: 'vip',
+                name: 'VIP User',
+                permissions: ['all_subjects']
+            },
+            'user': {
+                password: 'user123',
+                role: 'user',
+                name: 'Regular User',
+                permissions: ['limited']
+            },
+            'toan': {
+                password: 'toan123',
+                role: 'subject',
+                name: 'Toán User',
+                permissions: ['toanHoc'],
+                subject: 'toanHoc'
+            },
+            'van': {
+                password: 'van123',
+                role: 'subject',
+                name: 'Văn User',
+                permissions: ['vanHoc'],
+                subject: 'vanHoc'
+            },
+            'anh': {
+                password: 'anh123',
+                role: 'subject',
+                name: 'Anh User',
+                permissions: ['tiengAnh'],
+                subject: 'tiengAnh'
+            },
+            'ly': {
+                password: 'ly123',
+                role: 'subject',
+                name: 'Lý User',
+                permissions: ['vatLy'],
+                subject: 'vatLy'
+            }
+        };
+
+        // Khởi tạo
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('login-form');
+            const loginButton = document.getElementById('login-button');
+            const loginText = document.getElementById('login-text');
+            const loginLoading = document.getElementById('login-loading');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+
+            // Kiểm tra đã đăng nhập chưa
+            checkLoginStatus();
+
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+
+                if (!username || !password) {
+                    showError('Vui lòng nhập đầy đủ thông tin!');
+                    return;
+                }
+
+                // Hiển thị loading
+                loginButton.disabled = true;
+                loginText.style.display = 'none';
+                loginLoading.style.display = 'inline-block';
+
+                // Giả lập delay
+                setTimeout(() => {
+                    authenticateUser(username, password);
+                }, 1000);
+            });
+
+            function authenticateUser(username, password) {
+                const account = accounts[username];
+
+                if (!account || account.password !== password) {
+                    showError('Tên đăng nhập hoặc mật khẩu không đúng!');
+                    resetLoginButton();
+                    return;
+                }
+
+                // Lưu thông tin đăng nhập
+                const loginData = {
+                    username: username,
+                    role: account.role,
+                    name: account.name,
+                    permissions: account.permissions,
+                    subject: account.subject || null,
+                    loginTime: new Date().toISOString()
+                };
+
+                localStorage.setItem('loginData', JSON.stringify(loginData));
+                sessionStorage.setItem('isLoggedIn', 'true');
+
+                showSuccess(`Đăng nhập thành công! Chào mừng ${account.name}`);
+                
+                // Chuyển hướng dựa trên role
+                setTimeout(() => {
+                    redirectBasedOnRole(account);
+                }, 1500);
+            }
+
+            function redirectBasedOnRole(account) {
+                switch(account.role) {
+                    case 'admin':
+                        window.location.href = 'admin.html';
+                        break;
+                    case 'vip':
+                        window.location.href = 'index.html?vip=true';
+                        break;
+                    case 'subject':
+                        window.location.href = `index.html?subject=${account.subject}`;
+                        break;
+                    default:
+                        window.location.href = 'index.html';
+                }
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+            }
+
+            function showSuccess(message) {
+                successMessage.textContent = message;
+                successMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
+            }
+
+            function resetLoginButton() {
+                loginButton.disabled = false;
+                loginText.style.display = 'inline';
+                loginLoading.style.display = 'none';
+            }
+
+            function checkLoginStatus() {
+                const loginData = localStorage.getItem('loginData');
+                const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+                
+                if (loginData && isLoggedIn) {
+                    const data = JSON.parse(loginData);
+                    showSuccess(`Đã đăng nhập với tài khoản: ${data.name}`);
+                    
+                    // Tự động chuyển hướng sau 2 giây
+                    setTimeout(() => {
+                        redirectBasedOnRole(data);
+                    }, 2000);
+                }
+            }
+        });
+
+        // Hàm đăng xuất (có thể gọi từ các trang khác)
+        function logout() {
+            localStorage.removeItem('loginData');
+            sessionStorage.removeItem('isLoggedIn');
+            window.location.href = 'login.html';
+        }
+
+        // Export để sử dụng ở file khác
+        window.authSystem = {
+            logout: logout,
+            getLoginData: () => {
+                const data = localStorage.getItem('loginData');
+                return data ? JSON.parse(data) : null;
+            },
+            isLoggedIn: () => {
+                return sessionStorage.getItem('isLoggedIn') === 'true';
+            },
+            hasPermission: (permission) => {
+                const data = window.authSystem.getLoginData();
+                return data && (data.permissions.includes('all') || data.permissions.includes(permission));
+            }
+        };
+    </script>
+</body>
+</html> 
